@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="CrystalAR — visualizador educacional de estruturas cristalográficas CIF conectado ao Crystallography Open Database." />
+  <title>CrystalAR — CIF + COD em 3D e AR</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <video id="cameraVideo" playsinline muted autoplay></video>
+  <canvas id="scene" aria-label="Visualização cristalográfica 3D"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">C</div>
+      <div>
+        <h1>Crystal<span>AR</span></h1>
+        <p>CIF · COD · cela unitária · supercela · WebAR</p>
+      </div>
+    </div>
+    <div class="view-actions" aria-label="Modos de visualização">
+      <button id="galleryMode" class="button active" type="button">Galeria</button>
+      <button id="arMode" class="button" type="button">AR</button>
+      <button id="cameraFlip" class="button" type="button" disabled>Câmera: traseira</button>
+    </div>
+  </header>
+
+  <aside class="control-panel" aria-label="Controles do CrystalAR">
+    <div class="panel-heading">
+      <div>
+        <span class="eyebrow">Protótipo v0.1.0</span>
+        <h2>Carregar estrutura</h2>
+      </div>
+      <button id="collapseControls" class="icon-button" type="button" aria-label="Recolher controles">−</button>
+    </div>
+
+    <div id="controlBody" class="control-body">
+      <form id="codForm" class="stack">
+        <label for="codId">COD ID</label>
+        <div class="input-row">
+          <input id="codId" inputmode="numeric" pattern="[0-9]{7}" maxlength="8" value="9012293" aria-describedby="codHelp" />
+          <button class="primary" type="submit">Buscar</button>
+        </div>
+        <small id="codHelp">Exemplo: 9012293 (diamante)</small>
+      </form>
+
+      <div class="examples" aria-label="Exemplos COD">
+        <button type="button" data-cod="9012293">Diamante</button>
+        <button type="button" data-cod="5910030">BaO</button>
+        <button type="button" data-cod="5910063">CoFe₂O₄</button>
+      </div>
+
+      <div class="divider"><span>ou</span></div>
+
+      <label class="upload-box" for="cifFile">
+        <strong>Abrir arquivo CIF</strong>
+        <span>Processado localmente no navegador</span>
+        <input id="cifFile" type="file" accept=".cif,.mcif,text/plain,chemical/x-cif" />
+      </label>
+
+      <div class="settings-grid">
+        <label>
+          Representação
+          <select id="representation">
+            <option value="ball-stick">Ball-and-stick</option>
+            <option value="space-fill">Space-filling</option>
+            <option value="wire">Wireframe</option>
+          </select>
+        </label>
+        <label>
+          Supercela
+          <select id="supercell">
+            <option value="1">1 × 1 × 1</option>
+            <option value="2">2 × 2 × 2</option>
+            <option value="3">3 × 3 × 3</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="check-row">
+        <label><input id="showCell" type="checkbox" checked /> Mostrar cela</label>
+        <label><input id="showBonds" type="checkbox" checked /> Mostrar ligações</label>
+      </div>
+
+      <div class="action-row">
+        <button id="resetView" class="secondary" type="button">Centralizar</button>
+        <button id="downloadCif" class="secondary" type="button" disabled>Baixar CIF</button>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite">Pronto para carregar uma estrutura.</p>
+    </div>
+  </aside>
+
+  <section id="infoCard" class="info-card collapsed" aria-live="polite">
+    <button id="infoToggle" type="button" class="info-toggle" aria-expanded="false">
+      <div class="info-icon">◇</div>
+      <div class="info-summary">
+        <h2 id="structureName">CrystalAR</h2>
+        <p id="structureFormula">Aguardando estrutura</p>
+        <small id="structureMeta">COD ou upload de CIF</small>
+      </div>
+      <span class="chevron">⌃</span>
+    </button>
+    <div class="info-body">
+      <div id="infoGrid" class="info-grid"></div>
+      <div id="citationBox" class="citation-box hidden"></div>
+      <small class="source-note">Dados COD: CC0. Reconheça os autores originais dos dados estruturais.</small>
+    </div>
+  </section>
+
+  <div id="loading" class="loading hidden" role="status">
+    <div class="spinner"></div>
+    <p id="loadingText">Carregando…</p>
+  </div>
+
+  <div id="toastBox" class="toast-box" aria-live="polite"></div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
