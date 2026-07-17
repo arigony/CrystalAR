@@ -7,7 +7,7 @@ import { buildCrystalModel } from "../src/crystal.js";
 const examples = [
   ["diamond-9012293.cif", "9012293", 8],
   ["graphite-1200017.cif", "1200017", 4],
-  ["graphene-model.cif", "graphene_model", 2],
+  ["graphene-model.cif", "graphene_model", 32],
   ["nacl-1000041.cif", "1000041", 8],
   ["cscl-9008789.cif", "9008789", 2],
   ["mgo-1011173.cif", "1011173", 8],
@@ -32,5 +32,6 @@ test("grafeno é explicitamente identificado como modelo educacional", async () 
   const text = await readFile(new URL("../examples/graphene-model.cif", import.meta.url), "utf8");
   assert.match(text, /educational 2D model/i);
   assert.match(text, /artificial vacuum spacing/i);
+  assert.match(text, /4 x 4 in-plane patch/i);
   assert.doesNotMatch(text, /_cod_database_code\s+\d/i);
 });
