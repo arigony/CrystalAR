@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="CrystalAR — visualizador educacional de estruturas cristalográficas CIF conectado ao Crystallography Open Database." />
   <title>CrystalAR — CIF + COD em 3D e AR</title>
-  <link rel="stylesheet" href="style.css?v=0.1.1" />
+  <link rel="stylesheet" href="style.css?v=0.1.2" />
   <script type="importmap">
   {
     "imports": {
@@ -16,7 +16,7 @@
   </script>
 </head>
 <body>
-  <video id="cameraVideo" playsinline muted autoplay></video>
+  <video id="cameraVideo" playsinline webkit-playsinline muted autoplay></video>
   <canvas id="scene" aria-label="Visualização cristalográfica 3D"></canvas>
 
   <header class="topbar">
@@ -30,14 +30,14 @@
     <div class="view-actions" aria-label="Modos de visualização">
       <button id="galleryMode" class="button active" type="button">Galeria</button>
       <button id="arMode" class="button" type="button">AR</button>
-      <button id="cameraFlip" class="button" type="button" disabled>Câmera: traseira</button>
+      <button id="cameraFlip" class="button" type="button" title="Alternar câmera frontal/traseira">Câmera: traseira</button>
     </div>
   </header>
 
   <aside class="control-panel" aria-label="Controles do CrystalAR">
     <div class="panel-heading">
       <div>
-        <span class="eyebrow">Protótipo v0.1.1</span>
+        <span class="eyebrow">Protótipo v0.1.2</span>
         <h2>Carregar estrutura</h2>
       </div>
       <button id="collapseControls" class="icon-button" type="button" aria-label="Recolher controles">−</button>
@@ -47,16 +47,17 @@
       <form id="codForm" class="stack">
         <label for="codId">COD ID</label>
         <div class="input-row">
-          <input id="codId" inputmode="numeric" pattern="[0-9]{7}" maxlength="8" value="9012293" aria-describedby="codHelp" />
+          <input id="codId" inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8" value="9012293" aria-describedby="codHelp" />
           <button class="primary" type="submit">Buscar</button>
         </div>
-        <small id="codHelp">Exemplo: 9012293 (diamante)</small>
+        <small id="codHelp">Exemplo: 1506803 (resveratrol)</small>
       </form>
 
       <div class="examples" aria-label="Exemplos COD">
         <button type="button" data-cod="9012293">Diamante</button>
         <button type="button" data-cod="5910030">BaO</button>
         <button type="button" data-cod="5910063">CoFe₂O₄</button>
+        <button type="button" data-cod="1506803">Resveratrol</button>
       </div>
 
       <div class="divider"><span>ou</span></div>
@@ -124,6 +125,8 @@
 
   <div id="toastBox" class="toast-box" aria-live="polite"></div>
 
-  <script type="module" src="src/bootstrap.js?v=0.1.1"></script>
+  <!-- A câmera é interceptada antes de app.js, como na solução validada do MolecuAR. -->
+  <script src="src/camera-toggle.js?v=0.1.2"></script>
+  <script type="module" src="src/bootstrap.js?v=0.1.2"></script>
 </body>
 </html>
