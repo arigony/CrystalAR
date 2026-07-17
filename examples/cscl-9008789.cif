@@ -1,0 +1,35 @@
+data_9008789
+# CrystalAR educational local derivative.
+# Cell parameters and structure type are based on the cited experimental COD entry.
+# The conventional cell is expanded explicitly for reliable browser visualization.
+_chemical_name_common 'Caesium chloride (CsCl structure type)'
+_chemical_formula_sum 'Cs Cl'
+_space_group_name_H-M_alt 'P m -3 m'
+_space_group_IT_number 221
+_cell_length_a 4.123
+_cell_length_b 4.123
+_cell_length_c 4.123
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 70.0874
+_cell_formula_units_Z 1
+_cod_database_code 9008789
+_publ_section_title 'Crystal structure data corresponding to COD 9008789'
+_journal_name_full 'Crystal Structures'
+_journal_year 1963
+_journal_volume 1
+_journal_page_first 85
+_journal_page_last 237
+loop_
+_publ_author_name
+'Wyckoff, R. W. G.'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cs1 Cs 0 0 0 1
+Cl1 Cl 0.5 0.5 0.5 1
