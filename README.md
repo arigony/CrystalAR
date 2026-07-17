@@ -8,7 +8,7 @@
 
 ## Funcionalidades
 
-- busca direta por **COD ID**;
+- busca por **COD ID**, com tentativa direta e rotas alternativas compatíveis com CORS;
 - download de CIF pelo **Crystallography Open Database (COD)**;
 - upload local de arquivos `.cif`;
 - parser CIF executado no navegador;
@@ -19,7 +19,7 @@
 - inferência geométrica simples de ligações;
 - modo AR com câmera frontal ou traseira;
 - painel de proveniência e citação da estrutura original;
-- GitHub Pages, sem backend e sem chave de API.
+- GitHub Pages, sem backend próprio e sem chave de API.
 
 ## Executar
 
@@ -49,7 +49,8 @@ Os dados da COD e a base são dedicados ao domínio público sob **CC0**. O apli
 - A visualização depende das operações de simetria explicitamente presentes no arquivo CIF.
 - A inferência de ligações é geométrica e pode não representar corretamente ligações deslocalizadas, coordenação metálica ou contatos intermoleculares.
 - Desordem, ocupações parciais, modulações, estruturas magnéticas e múltiplos blocos de dados ainda exigem suporte adicional.
-- A busca direta depende de o servidor COD permitir requisições CORS no navegador. O upload local permanece disponível como alternativa.
+- Como o servidor COD pode bloquear requisições CORS feitas diretamente pelo navegador, o protótipo tenta serviços públicos intermediários apenas para recuperar o CIF solicitado. Esses serviços podem apresentar indisponibilidade ou limites de uso. O upload local permanece disponível como alternativa independente.
+- Arquivos enviados pelo usuário são processados localmente no navegador e não são enviados aos serviços intermediários.
 - Supercelas grandes podem reduzir o desempenho em celulares.
 - O modo AR é uma sobreposição de câmera; ancoragem em superfícies reais exigirá WebXR hit-test em uma etapa futura.
 
@@ -58,6 +59,7 @@ Os dados da COD e a base são dedicados ao domínio público sob **CC0**. O apli
 ```text
 index.html
 style.css
+src/bootstrap.js
 src/app.js
 src/cif-parser.js
 src/crystal.js
