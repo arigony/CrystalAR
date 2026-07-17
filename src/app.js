@@ -3,7 +3,8 @@ import { buildCrystalModel } from "./crystal.js";
 import { CrystalRenderer } from "./renderer.js";
 
 const COD_BASE = "https://www.crystallography.net/cod";
-const state = { text: "", filename: "", source: "", doc: null, model: null, stream: null, facing: "environment" };
+const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 780;
+const state = { text: "", filename: "", source: "", doc: null, model: null, stream: null };
 const $ = id => document.getElementById(id);
 const renderer = new CrystalRenderer($("scene"));
 
@@ -109,28 +110,12 @@ async function fetchCOD(codId) {
   const url = `${COD_BASE}/${codId}.cif`;
   showLoading(`Buscando COD ${codId}…`);
   try {
-    const response = await fetch(url, { mode: "cors" });
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`COD respondeu HTTP ${response.status}.`);
     const text = await response.text();
     if (!/\bdata_/i.test(text) || !/_cell_length_a/i.test(text)) throw new Error("A resposta recebida não parece ser um arquivo CIF válido.");
-    processCIF(text, `${codId}.cif`, `COD ${codId}`);
-  } catch (error) {
-    // O servidor COD pode variar quanto a CORS. Mantemos um exemplo CC0 local para
-    // que o primeiro carregamento continue funcional, sem ocultar a origem do dado.
-    if (codId === "9012293") {
-      const fallback = await fetch("examples/diamond-9012293-demo.cif");
-      if (fallback.ok) {
-        const text = await fallback.text();
-        processCIF(text, "diamond-9012293-demo.cif", "exemplo educacional local · COD 9012293");
-        setStatus("Acesso direto ao COD indisponível nesta tentativa; foi carregado o exemplo educacional local do diamante.", "success");
-        toast("Exemplo local carregado; tente novamente o COD mais tarde.");
-        return;
-      }
-    }
-    if (error instanceof TypeError) {
-      throw new Error("O navegador não conseguiu acessar o COD diretamente. Use o upload após baixar o CIF, ou tente novamente mais tarde.");
-    }
-    throw error;
+    const route = response.headers.get("X-CrystalAR-Route") || "COD";
+    processCIF(text, `${codId}.cif`, `${route} · COD ${codId}`);
   } finally {
     hideLoading();
   }
@@ -162,37 +147,89 @@ function rebuildFromState() {
   }
 }
 
-async function startAR() {
-  if (!window.isSecureContext) throw new Error("O modo AR requer HTTPS.");
-  if (!navigator.mediaDevices?.getUserMedia) throw new Error("Este navegador não oferece acesso à câmera.");
+function cameraErrorMessage(error) {
+  if (["NotAllowedError", "SecurityError"].includes(error?.name)) {
+    return "A câmera foi bloqueada. Autorize a câmera nas permissões do navegador e toque em AR novamente.";
+  }
+  if (["NotFoundError", "OverconstrainedError"].includes(error?.name)) {
+    return "Nenhuma câmera compatível foi encontrada neste dispositivo.";
+  }
+  if (["NotReadableError", "AbortError"].includes(error?.name)) {
+    return "A câmera está ocupada por outro aplicativo ou não pôde ser iniciada.";
+  }
+  return error?.message || "Não foi possível iniciar a câmera.";
+}
+
+async function startCamera() {
+  if (!window.isSecureContext) throw new Error("Abra esta página em HTTPS. No GitHub Pages isso já ocorre automaticamente.");
+  if (!navigator.mediaDevices?.getUserMedia) throw new Error("Este navegador não oferece suporte à câmera.");
+
   stopCamera();
   state.stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: { facingMode: { ideal: state.facing }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    video: {
+      facingMode: "environment",
+      width: { ideal: IS_MOBILE ? 640 : 1280 },
+      height: { ideal: IS_MOBILE ? 480 : 720 },
+      frameRate: { ideal: IS_MOBILE ? 24 : 30, max: 30 }
+    }
   });
-  $("cameraVideo").srcObject = state.stream;
-  await $("cameraVideo").play();
-  document.body.classList.add("ar-active");
-  document.body.classList.toggle("front-camera", state.facing === "user");
-  renderer.setAR(true);
-  $("galleryMode").classList.remove("active");
-  $("arMode").classList.add("active");
-  $("cameraFlip").disabled = false;
+
+  const video = $("cameraVideo");
+  video.srcObject = state.stream;
+  await new Promise((resolve, reject) => {
+    let done = false;
+    const finish = async () => {
+      if (done) return;
+      done = true;
+      try {
+        await video.play();
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    };
+    video.onloadedmetadata = finish;
+    setTimeout(finish, 700);
+  });
+}
+
+async function startAR() {
+  if (document.body.classList.contains("ar-active")) return;
+  showLoading("Iniciando câmera…");
+  try {
+    await startCamera();
+    const video = $("cameraVideo");
+    video.classList.add("ar-visible");
+    document.body.classList.add("ar-active");
+    renderer.setAR(true);
+    $("galleryMode").classList.remove("active");
+    $("arMode").classList.add("active");
+    setStatus("AR ativo. Arraste para girar e use o gesto de pinça para ampliar.", "success");
+    hideLoading();
+    toast("Câmera ativada. CrystalAR em modo AR.", "success");
+  } catch (error) {
+    hideLoading();
+    stopAR();
+    throw new Error(cameraErrorMessage(error));
+  }
 }
 
 function stopCamera() {
   if (state.stream) state.stream.getTracks().forEach(track => track.stop());
   state.stream = null;
-  $("cameraVideo").srcObject = null;
+  const video = $("cameraVideo");
+  video.srcObject = null;
+  video.onloadedmetadata = null;
 }
 
 function stopAR() {
   stopCamera();
-  document.body.classList.remove("ar-active", "front-camera");
+  $("cameraVideo").classList.remove("ar-visible");
+  document.body.classList.remove("ar-active");
   renderer.setAR(false);
   $("galleryMode").classList.add("active");
   $("arMode").classList.remove("active");
-  $("cameraFlip").disabled = true;
 }
 
 $("codForm").addEventListener("submit", async event => {
@@ -241,19 +278,17 @@ $("infoToggle").addEventListener("click", () => {
   $("infoToggle").setAttribute("aria-expanded", expanded ? "true" : "false");
 });
 
-$("arMode").addEventListener("click", () => startAR().catch(error => { setStatus(error.message, "error"); toast(error.message, "error"); stopAR(); }));
+$("arMode").addEventListener("click", () => startAR().catch(error => {
+  setStatus(error.message, "error");
+  toast(error.message, "error");
+}));
 $("galleryMode").addEventListener("click", stopAR);
-$("cameraFlip").addEventListener("click", async () => {
-  state.facing = state.facing === "environment" ? "user" : "environment";
-  $("cameraFlip").textContent = state.facing === "environment" ? "Câmera: traseira" : "Câmera: frontal";
-  try { await startAR(); } catch (error) { setStatus(error.message, "error"); toast(error.message, "error"); }
-});
 
 addEventListener("beforeunload", stopCamera);
+addEventListener("pagehide", stopCamera);
 
-// Carrega o exemplo inicial. Se o servidor COD bloquear CORS, a interface orienta o upload local.
 fetchCOD("9012293").catch(error => {
   hideLoading();
   setStatus(error.message, "error");
-  toast("Busca direta indisponível; o upload de CIF continua funcional.", "error");
+  toast("Busca inicial indisponível; o upload de CIF continua funcional.", "error");
 });
