@@ -183,5 +183,12 @@
 
   <script src="src/camera-toggle.js?v=0.3.0"></script>
   <script type="module" src="src/app.js?v=0.3.0"></script>
+  <script>
+    window.addEventListener("load", () => {
+      document.querySelector('[data-example="graphene"]')?.addEventListener("click", () => {
+        document.getElementById("supercell").value = "1";
+      });
+    });
+  </script>
 </body>
 </html>
