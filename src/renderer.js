@@ -22,6 +22,7 @@ function makeCylinder(start, end, radius, material) {
   const b = new THREE.Vector3(...end);
   const direction = b.clone().sub(a);
   const length = direction.length();
+  if (!Number.isFinite(length) || length < 1e-6) return null;
   const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 10), material);
   cylinder.position.copy(a).add(b).multiplyScalar(.5);
   cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
@@ -62,9 +63,16 @@ export class CrystalRenderer {
     this.controls.enablePan = true;
     this.controls.autoRotate = true;
     this.controls.autoRotateSpeed = .45;
+
     this.modelGroup = null;
+    this.contentGroup = null;
     this.currentModel = null;
+    this.modelMaxDimension = 5;
     this.options = { representation: "ball-stick", showCell: true, showBonds: true };
+    this.arActive = false;
+    this.arTargetPosition = new THREE.Vector3(0, .08, 0);
+    this.arTargetQuaternion = new THREE.Quaternion();
+    this.arTargetScale = new THREE.Vector3(1, 1, 1);
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x56616d, 2.0));
     const key = new THREE.DirectionalLight(0xffffff, 2.5);
@@ -88,16 +96,51 @@ export class CrystalRenderer {
     this.camera.updateProjectionMatrix();
   }
 
+  getARBaseScale() {
+    return THREE.MathUtils.clamp(6 / Math.max(this.modelMaxDimension, 1), .38, 1.05);
+  }
+
+  resetARTarget() {
+    const base = this.getARBaseScale();
+    this.arTargetPosition.set(0, .08, 0);
+    this.arTargetQuaternion.identity();
+    this.arTargetScale.set(base, base, base);
+    if (this.modelGroup && this.arActive) {
+      this.modelGroup.position.copy(this.arTargetPosition);
+      this.modelGroup.quaternion.copy(this.arTargetQuaternion);
+      this.modelGroup.scale.copy(this.arTargetScale);
+    }
+  }
+
+  setARTarget({ position, quaternion, scale } = {}) {
+    if (position) this.arTargetPosition.set(position[0], position[1], position[2]);
+    if (quaternion) this.arTargetQuaternion.copy(quaternion);
+    if (Number.isFinite(scale)) this.arTargetScale.setScalar(scale);
+  }
+
   setAR(active) {
-    this.scene.background = active ? null : new THREE.Color(0xe8edf0);
-    this.renderer.setClearColor(active ? 0x000000 : 0xe8edf0, active ? 0 : 1);
+    this.arActive = Boolean(active);
+    this.scene.background = this.arActive ? null : new THREE.Color(0xe8edf0);
+    this.renderer.setClearColor(this.arActive ? 0x000000 : 0xe8edf0, this.arActive ? 0 : 1);
+    this.controls.enabled = !this.arActive;
+    this.controls.autoRotate = !this.arActive;
+
+    if (this.arActive) {
+      this.resetARTarget();
+    } else if (this.modelGroup) {
+      this.modelGroup.position.set(0, 0, 0);
+      this.modelGroup.quaternion.identity();
+      this.modelGroup.scale.set(1, 1, 1);
+      this.fitToObject(this.modelGroup);
+    }
   }
 
   renderModel(model, options = {}) {
     this.currentModel = model;
     this.options = { ...this.options, ...options };
     if (this.modelGroup) this.scene.remove(this.modelGroup);
-    const group = new THREE.Group();
+
+    const content = new THREE.Group();
     const atomGroup = new THREE.Group();
     atomGroup.name = "atoms";
     const bondGroup = new THREE.Group();
@@ -120,30 +163,40 @@ export class CrystalRenderer {
       const bonds = inferBonds(model.atoms);
       const material = new THREE.MeshStandardMaterial({ color: representation === "wire" ? 0x5e6c74 : 0xb9c0c5, roughness: .55 });
       const radius = representation === "wire" ? .035 : .075;
-      for (const [a, b] of bonds) bondGroup.add(makeCylinder(model.atoms[a].cart, model.atoms[b].cart, radius, material));
+      for (const [a, b] of bonds) {
+        const cylinder = makeCylinder(model.atoms[a].cart, model.atoms[b].cart, radius, material);
+        if (cylinder) bondGroup.add(cylinder);
+      }
     }
 
-    group.add(bondGroup, atomGroup);
-    if (this.options.showCell) addCellFrame(group, model.vectors, model.repeat);
-    this.scene.add(group);
-    this.modelGroup = group;
-    this.fitToObject(group);
-    return { atomCount: model.atoms.length, bondCount: bondGroup.children.length };
-  }
+    content.add(bondGroup, atomGroup);
+    if (this.options.showCell) addCellFrame(content, model.vectors, model.repeat);
 
-  updateOptions(options = {}) {
-    if (!this.currentModel) return null;
-    return this.renderModel(this.currentModel, options);
+    const initialBox = new THREE.Box3().setFromObject(content);
+    const center = new THREE.Vector3();
+    const size = new THREE.Vector3();
+    initialBox.getCenter(center);
+    initialBox.getSize(size);
+    content.position.sub(center);
+    this.modelMaxDimension = Math.max(size.x, size.y, size.z, 2);
+
+    const root = new THREE.Group();
+    root.add(content);
+    this.scene.add(root);
+    this.modelGroup = root;
+    this.contentGroup = content;
+
+    if (this.arActive) this.resetARTarget();
+    else this.fitToObject(root);
+
+    return { atomCount: model.atoms.length, bondCount: bondGroup.children.length };
   }
 
   fitToObject(object) {
     const box = new THREE.Box3().setFromObject(object);
     if (box.isEmpty()) return;
     const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
     box.getSize(size);
-    box.getCenter(center);
-    object.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z, 2);
     const distance = Math.min(Math.max(maxDim * 1.75, 5), 80);
     this.camera.position.set(distance * .8, distance * .65, distance);
@@ -155,11 +208,17 @@ export class CrystalRenderer {
   }
 
   resetView() {
-    if (this.modelGroup) this.fitToObject(this.modelGroup);
+    if (this.arActive) this.resetARTarget();
+    else if (this.modelGroup) this.fitToObject(this.modelGroup);
   }
 
   animate() {
     requestAnimationFrame(() => this.animate());
+    if (this.arActive && this.modelGroup) {
+      this.modelGroup.position.lerp(this.arTargetPosition, .16);
+      this.modelGroup.quaternion.slerp(this.arTargetQuaternion, .14);
+      this.modelGroup.scale.lerp(this.arTargetScale, .14);
+    }
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
