@@ -1,0 +1,41 @@
+data_1011173
+# CrystalAR educational local derivative.
+# Cell parameters and structure type are based on the cited experimental COD entry.
+# The conventional cell is expanded explicitly for reliable browser visualization.
+_chemical_name_common 'Magnesium oxide (periclase, rock-salt structure)'
+_chemical_formula_sum 'Mg4 O4'
+_space_group_name_H-M_alt 'F m -3 m'
+_space_group_IT_number 225
+_cell_length_a 4.22
+_cell_length_b 4.22
+_cell_length_c 4.22
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 75.1514
+_cell_formula_units_Z 4
+_cod_database_code 1011173
+_publ_section_title 'Crystal structure data corresponding to COD 1011173'
+_journal_name_full 'Nature'
+_journal_year 1920
+_journal_volume 105
+_journal_page_first 646
+_journal_page_last 648
+loop_
+_publ_author_name
+'Bragg, W. L.'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mg1 Mg 0 0 0 1
+Mg2 Mg 0 0.5 0.5 1
+Mg3 Mg 0.5 0 0.5 1
+Mg4 Mg 0.5 0.5 0 1
+O1 O 0.5 0 0 1
+O2 O 0 0.5 0 1
+O3 O 0 0 0.5 1
+O4 O 0.5 0.5 0.5 1
