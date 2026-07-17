@@ -1,0 +1,38 @@
+data_5910030_demo
+_cod_database_code 5910030
+_chemical_name_common 'Barium oxide'
+_chemical_formula_sum 'Ba O'
+_space_group_name_H-M_alt 'F m -3 m'
+_space_group_IT_number 225
+_cell_length_a 5.500
+_cell_length_b 5.500
+_cell_length_c 5.500
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 166.375
+_cell_formula_units_Z 4
+_publ_author_name 'Wyckoff, R. W. G.'
+_publ_section_title 'Pages 215 & 224 from the second edition of Structure of Crystals'
+_journal_name_full 'The second edition of Structure of Crystals'
+_journal_year 1931
+_journal_page_first 215
+_journal_page_last 224
+loop_
+_space_group_symop_operation_xyz
+'x,y,z'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.000000 0.000000 0.000000 1
+Ba2 Ba 0.000000 0.500000 0.500000 1
+Ba3 Ba 0.500000 0.000000 0.500000 1
+Ba4 Ba 0.500000 0.500000 0.000000 1
+O1 O 0.500000 0.500000 0.500000 1
+O2 O 0.500000 0.000000 0.000000 1
+O3 O 0.000000 0.500000 0.000000 1
+O4 O 0.000000 0.000000 0.500000 1
