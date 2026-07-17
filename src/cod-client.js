@@ -40,12 +40,18 @@ export function validateCODPayload(text, requestedId) {
   return cif;
 }
 
-export function extractCIFTextFromDatasetResponse(payload) {
-  const result = payload?.rows?.[0];
-  if (!result?.row) return "";
-  const truncated = Array.isArray(result.truncated_cells) && result.truncated_cells.some(cell => cell === "cif_text" || cell?.column === "cif_text");
-  if (truncated) throw new Error("O espelho retornou o CIF truncado.");
-  return normalizeCIFPayload(result.row.cif_text);
+export function extractCIFTextFromDatasetResponse(payload, requestedId = "") {
+  const rows = Array.isArray(payload?.rows) ? payload.rows : [];
+  for (const result of rows) {
+    if (!result?.row) continue;
+    const truncated = Array.isArray(result.truncated_cells) && result.truncated_cells.some(cell => cell === "cif_text" || cell?.column === "cif_text");
+    if (truncated) continue;
+    const cif = normalizeCIFPayload(result.row.cif_text);
+    if (!looksLikeCIF(cif)) continue;
+    const rowId = String(result.row.file ?? extractDeclaredCODId(cif));
+    if (!requestedId || rowId === String(requestedId)) return cif;
+  }
+  return "";
 }
 
 function cacheRequest(id) {
@@ -99,18 +105,20 @@ async function fetchFromConfiguredProxy(id) {
 }
 
 async function fetchFromHuggingFace(id) {
-  const url = new URL("https://datasets-server.huggingface.co/filter");
+  // /search is used instead of /filter because the Dataset Viewer documents that
+  // search responses are not truncated. We still validate the exact numeric COD ID.
+  const url = new URL("https://datasets-server.huggingface.co/search");
   url.searchParams.set("dataset", DATASET);
   url.searchParams.set("config", "default");
   url.searchParams.set("split", "train");
-  url.searchParams.set("where", `\"file\"=${id}`);
-  url.searchParams.set("length", "1");
+  url.searchParams.set("query", id);
+  url.searchParams.set("length", "20");
 
-  const response = await fetchWithTimeout(url, { mode: "cors" }, 20000);
+  const response = await fetchWithTimeout(url, { mode: "cors" }, 25000);
   if (!response.ok) throw new Error(`espelho COD: HTTP ${response.status}`);
   const payload = await response.json();
-  const cif = extractCIFTextFromDatasetResponse(payload);
-  if (!cif) throw new Error("COD ID não encontrado no espelho.");
+  const cif = extractCIFTextFromDatasetResponse(payload, id);
+  if (!cif) throw new Error("COD ID exato não encontrado no espelho ou resposta incompleta.");
   return validateCODPayload(cif, id);
 }
 
