@@ -10,8 +10,84 @@ const DEBUG_HAND = new URLSearchParams(location.search).has("debug");
 const DETECT_INTERVAL_MS = IS_MOBILE ? 120 : 90;
 const $ = id => document.getElementById(id);
 
+const EDUCATIONAL_EXAMPLES = {
+  diamond: {
+    label: "Diamante",
+    path: "examples/diamond-9012293.cif",
+    codId: "9012293",
+    provenance: "Derivado da determinação experimental COD 9012293",
+    teachingNote: "Rede covalente tridimensional. Cada carbono apresenta coordenação tetraédrica 4.",
+    representation: "ball-stick", showBonds: true, supercell: 2
+  },
+  graphite: {
+    label: "Grafite 2H",
+    path: "examples/graphite-1200017.cif",
+    codId: "1200017",
+    provenance: "Derivado da determinação experimental COD 1200017",
+    teachingNote: "Camadas hexagonais com empilhamento AB. Os cilindros representam as ligações C–C dentro das folhas; não representam forças entre as camadas.",
+    representation: "ball-stick", showBonds: true, supercell: 2
+  },
+  graphene: {
+    label: "Grafeno",
+    path: "examples/graphene-model.cif",
+    codId: "",
+    provenance: "Modelo 2D educacional baseado em parâmetros experimentais",
+    teachingNote: "Monocamada periódica. O parâmetro c = 20 Å é um espaço de vácuo artificial, não uma dimensão experimental do grafeno.",
+    representation: "ball-stick", showBonds: true, supercell: 3
+  },
+  nacl: {
+    label: "NaCl — sal-gema",
+    path: "examples/nacl-1000041.cif",
+    codId: "1000041",
+    provenance: "Derivado da determinação experimental COD 1000041",
+    teachingNote: "Estrutura tipo sal-gema, coordenação 6:6. O modo space-filling evita sugerir ligações covalentes localizadas.",
+    representation: "space-fill", showBonds: false, supercell: 2
+  },
+  cscl: {
+    label: "CsCl",
+    path: "examples/cscl-9008789.cif",
+    codId: "9008789",
+    provenance: "Derivado da determinação experimental COD 9008789",
+    teachingNote: "Estrutura tipo CsCl, coordenação 8:8. A cela primitiva contém um Cs e um Cl.",
+    representation: "space-fill", showBonds: false, supercell: 3
+  },
+  mgo: {
+    label: "MgO — periclásio",
+    path: "examples/mgo-1011173.cif",
+    codId: "1011173",
+    provenance: "Derivado da determinação experimental COD 1011173",
+    teachingNote: "Óxido iônico com estrutura tipo sal-gema e coordenação 6:6.",
+    representation: "space-fill", showBonds: false, supercell: 2
+  },
+  caf2: {
+    label: "CaF₂ — fluorita",
+    path: "examples/caf2-1000043.cif",
+    codId: "1000043",
+    provenance: "Derivado da determinação experimental COD 1000043",
+    teachingNote: "Estrutura fluorita: cada Ca²⁺ é coordenado por oito F⁻; cada F⁻ possui coordenação tetraédrica por quatro Ca²⁺.",
+    representation: "space-fill", showBonds: false, supercell: 2
+  },
+  znsSphalerite: {
+    label: "ZnS — blenda",
+    path: "examples/zns-sphalerite-9000107.cif",
+    codId: "9000107",
+    provenance: "Derivado da determinação experimental COD 9000107",
+    teachingNote: "Polimorfo cúbico do ZnS. Zn e S apresentam coordenação tetraédrica 4:4.",
+    representation: "ball-stick", showBonds: true, supercell: 2
+  },
+  znsWurtzite: {
+    label: "ZnS — wurtzita 2H",
+    path: "examples/zns-wurtzite-1100044.cif",
+    codId: "1100044",
+    provenance: "Derivado da determinação experimental COD 1100044",
+    teachingNote: "Polimorfo hexagonal do ZnS. Mantém coordenação tetraédrica 4:4, mas altera a sequência de empilhamento.",
+    representation: "ball-stick", showBonds: true, supercell: 2
+  }
+};
+
 const state = {
   text: "", filename: "", source: "", doc: null, model: null,
+  displayName: "", provenance: "", teachingNote: "", experimentalCod: "", exampleKey: "",
   stream: null, arActive: false, tracker: null, trackerPromise: null,
   detectTimer: null, handDetected: false, handSeenAt: 0,
   pinchScaleFactor: 1, lastPinchDistance: null,
@@ -74,11 +150,13 @@ function citationText(metadata) {
 
 function renderInfo(model, counts) {
   const { metadata, cell } = model;
-  $("structureName").textContent = metadata.name || `COD ${metadata.codId}`;
+  const displayedCod = state.experimentalCod || (metadata.codId && /^\d{7,8}$/.test(metadata.codId) ? metadata.codId : "não se aplica");
+  $("structureName").textContent = state.displayName || metadata.name || `COD ${metadata.codId}`;
   $("structureFormula").textContent = metadata.formula || "—";
   $("structureMeta").textContent = `${state.source} · ${counts.atomCount} átomos renderizados · ${counts.bondCount} ligações`;
   $("infoGrid").replaceChildren(
-    item("COD ID", metadata.codId || "arquivo local"),
+    item("Classificação", state.provenance || "Arquivo CIF", true),
+    item("COD ID", displayedCod),
     item("Grupo espacial", metadata.spaceGroup),
     item("Nº do grupo", metadata.spaceGroupNumber),
     item("Z", metadata.z),
@@ -87,14 +165,16 @@ function renderInfo(model, counts) {
     item("Volume", metadata.volume === "—" ? "—" : `${metadata.volume} Å³`),
     item("Densidade", metadata.density === "—" ? "—" : `${metadata.density} g cm⁻³`),
     item("Temperatura", metadata.temperature === "—" ? "—" : `${metadata.temperature} K`),
-    item("Operações de simetria", String(model.symmetryOperations.length)),
-    item("Sítios assimétricos", String(model.asymmetricAtoms.length)),
+    item("Sítios no arquivo", String(model.asymmetricAtoms.length)),
     item("Átomos na cela", String(model.unitAtoms.length))
   );
   const citation = citationText(metadata);
   const box = $("citationBox");
-  if (citation) {
-    box.textContent = `Citação da estrutura original: ${citation}`;
+  const parts = [];
+  if (state.teachingNote) parts.push(`Nota didática: ${state.teachingNote}`);
+  if (citation) parts.push(`Referência estrutural: ${citation}`);
+  if (parts.length) {
+    box.textContent = parts.join(" ");
     box.classList.remove("hidden");
   } else box.classList.add("hidden");
 }
@@ -107,35 +187,84 @@ function currentOptions() {
   };
 }
 
-function processCIF(text, filename, source) {
+function processCIF(text, filename, context = {}) {
   const doc = parseCIFDocument(text);
   const repeat = Number($("supercell").value);
   const model = buildCrystalModel(doc, repeat);
   const counts = renderer.renderModel(model, currentOptions());
   state.text = text;
   state.filename = filename;
-  state.source = source;
+  state.source = context.source || "arquivo CIF";
+  state.displayName = context.displayName || "";
+  state.provenance = context.provenance || "Arquivo CIF";
+  state.teachingNote = context.teachingNote || "";
+  state.experimentalCod = context.experimentalCod || "";
+  state.exampleKey = context.exampleKey || "";
   state.doc = doc;
   state.model = model;
   $("downloadCif").disabled = false;
   renderInfo(model, counts);
-  setStatus(`Estrutura carregada: ${counts.atomCount} átomos e ${counts.bondCount} ligações na supercela ${repeat} × ${repeat} × ${repeat}. Fonte: ${source}.`, "success");
-  toast("Estrutura cristalográfica carregada.", "success");
+  setStatus(`Estrutura carregada: ${counts.atomCount} átomos e ${counts.bondCount} ligações na supercela ${repeat} × ${repeat} × ${repeat}. Fonte: ${state.source}.`, "success");
+  toast(`${state.displayName || model.metadata.name} carregado.`, "success");
+}
+
+function setActiveExample(key = "") {
+  document.querySelectorAll("[data-example]").forEach(button => {
+    const active = button.dataset.example === key;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+}
+
+async function loadLocalExample(key) {
+  const example = EDUCATIONAL_EXAMPLES[key];
+  if (!example) return;
+  showLoading(`Abrindo ${example.label}…`);
+  setStatus(`Carregando o exemplo local ${example.label}…`, "pending");
+  setActiveExample(key);
+  $("representation").value = example.representation;
+  $("showBonds").checked = example.showBonds;
+  $("showCell").checked = true;
+  $("supercell").value = String(example.supercell);
+  if (example.codId) $("codId").value = example.codId;
+  try {
+    const response = await fetch(example.path, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Arquivo local respondeu HTTP ${response.status}.`);
+    const text = await response.text();
+    processCIF(text, example.path.split("/").pop(), {
+      source: example.codId ? `galeria local · COD ${example.codId}` : "galeria local · modelo 2D",
+      displayName: example.label,
+      provenance: example.provenance,
+      teachingNote: example.teachingNote,
+      experimentalCod: example.codId,
+      exampleKey: key
+    });
+  } catch (error) {
+    setActiveExample("");
+    setStatus(`Não foi possível abrir ${example.label}. ${error.message}`, "error");
+    toast(`Falha ao abrir ${example.label}.`, "error");
+    console.error(error);
+  } finally { hideLoading(); }
 }
 
 async function loadCOD(codId) {
   const id = String(codId || "").trim();
   showLoading(`Buscando COD ${id}…`);
   $("searchButton").disabled = true;
+  setActiveExample("");
   setStatus(`Consultando COD ${id}…`, "pending");
   try {
     const result = await fetchCIFById(id);
-    processCIF(result.text, `${id}.cif`, `${result.source} · COD ${id}`);
+    processCIF(result.text, `${id}.cif`, {
+      source: `${result.source} · COD ${id}`,
+      provenance: "CIF solicitado por COD ID",
+      experimentalCod: id
+    });
   } catch (error) {
-    const previous = state.model?.metadata?.codId || state.filename || "nenhuma";
+    const previous = state.displayName || state.model?.metadata?.codId || state.filename || "nenhuma";
     setStatus(`Falha ao carregar COD ${id}. A visualização anterior (${previous}) foi mantida. ${error.message}`, "error");
     $("structureMeta").textContent = `BUSCA COD ${id} FALHOU — exibindo a estrutura anterior`;
-    toast(`COD ${id} não foi carregado. Veja a mensagem no painel.`, "error");
+    toast(`COD ${id} não foi carregado. Use a galeria local ou abra um CIF.`, "error");
     console.error(error);
   } finally {
     hideLoading();
@@ -146,11 +275,13 @@ async function loadCOD(codId) {
 async function handleFile(file) {
   if (!file) return;
   showLoading(`Abrindo ${file.name}…`);
+  setActiveExample("");
   try {
-    processCIF(await file.text(), file.name, `arquivo local: ${file.name}`);
-  } finally {
-    hideLoading();
-  }
+    processCIF(await file.text(), file.name, {
+      source: `arquivo local: ${file.name}`,
+      provenance: "Arquivo CIF fornecido pelo usuário"
+    });
+  } finally { hideLoading(); }
 }
 
 function rebuildFromState() {
@@ -211,11 +342,8 @@ async function buildTracker() {
         modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
         delegate: "CPU"
       },
-      runningMode: "VIDEO",
-      numHands: 1,
-      minHandDetectionConfidence: .2,
-      minHandPresenceConfidence: .2,
-      minTrackingConfidence: .2
+      runningMode: "VIDEO", numHands: 1,
+      minHandDetectionConfidence: .2, minHandPresenceConfidence: .2, minTrackingConfidence: .2
     });
     return state.tracker;
   })();
@@ -302,7 +430,6 @@ async function startAR() {
     hideLoading();
     setStatus("AR ativo. Arraste para girar; pinça/roda para zoom. Carregando rastreamento de mãos…", "success");
     setHandStatus("AR por toque ativo — carregando HandLandmarker…", false);
-
     buildTracker().then(() => {
       if (!state.arActive) return;
       clearInterval(state.detectTimer);
@@ -397,11 +524,13 @@ canvas.addEventListener("touchmove", event => {
   if (!state.handDetected || performance.now() - state.handSeenAt > 700) applyManualPose();
 }, { passive: false });
 
-$("codForm").addEventListener("submit", event => { event.preventDefault(); loadCOD($("codId").value); });
-document.querySelectorAll("[data-cod]").forEach(button => button.addEventListener("click", () => {
-  $("codId").value = button.dataset.cod;
-  loadCOD(button.dataset.cod);
-}));
+$("codForm").addEventListener("submit", event => {
+  event.preventDefault();
+  loadCOD($("codId").value);
+});
+document.querySelectorAll("[data-example]").forEach(button => {
+  button.addEventListener("click", () => loadLocalExample(button.dataset.example));
+});
 $("cifFile").addEventListener("change", event => handleFile(event.target.files?.[0]).catch(error => {
   hideLoading(); setStatus(error.message, "error"); toast(error.message, "error");
 }));
@@ -436,4 +565,4 @@ $("galleryMode").addEventListener("click", stopAR);
 addEventListener("beforeunload", stopCamera);
 addEventListener("pagehide", stopCamera);
 
-loadCOD("9012293");
+loadLocalExample("diamond");
