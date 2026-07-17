@@ -1,0 +1,37 @@
+data_1200017
+# CrystalAR educational local derivative.
+# Cell parameters and structure type are based on the cited experimental COD entry.
+# The conventional cell is expanded explicitly for reliable browser visualization.
+_chemical_name_common 'Graphite 2H (AB stacking)'
+_chemical_formula_sum 'C4'
+_space_group_name_H-M_alt 'P 63/m m c'
+_space_group_IT_number 194
+_cell_length_a 2.47
+_cell_length_b 2.47
+_cell_length_c 6.79
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 120
+_cell_volume 35.8752
+_cell_formula_units_Z 4
+_cod_database_code 1200017
+_publ_section_title 'Crystal structure data corresponding to COD 1200017'
+_journal_name_full 'Zeitschrift fuer Physik'
+_journal_year 1924
+_journal_volume 25
+_journal_page_first 317
+_journal_page_last 337
+loop_
+_publ_author_name
+'Hassel, O.'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+C1 C 0.00000000 0.00000000 0.00000000 1
+C2 C 0.33333333 0.66666667 0.00000000 1
+C3 C 0.00000000 0.00000000 0.50000000 1
+C4 C 0.66666667 0.33333333 0.50000000 1
