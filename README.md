@@ -4,16 +4,18 @@
 
 ## Versão
 
-`v0.2.0` — refatoração da camada de dados e AR com rastreamento de mãos.
+`v0.2.1` — correção da busca por COD ID com filtro numérico exato e tempo de espera limitado.
 
 ## Funcionalidades
 
 - busca por **COD ID**;
 - validação do COD ID devolvido para impedir a exibição de uma estrutura incorreta;
+- filtro exato na coluna numérica `file` do espelho COD, evitando busca textual lenta em centenas de milhares de CIFs;
+- consultas remotas em paralelo, com tempo limite;
 - cache via Cache Storage;
 - exemplos locais de diamante, BaO e CoFe₂O₄;
 - fallback para um snapshot CC0 do COD no Hugging Face Dataset Viewer;
-- suporte a proxy próprio do CrystalAR via Cloudflare Worker;
+- suporte opcional a proxy próprio configurado em `window.CRYSTALAR_PROXY_URL`;
 - upload local de arquivos `.cif`;
 - parser CIF executado no navegador;
 - cela unitária e supercelas `1×1×1`, `2×2×2` e `3×3×3`;
@@ -25,15 +27,15 @@
 
 ## Arquitetura de dados
 
-O navegador tenta, nesta ordem:
+O navegador tenta:
 
 1. cache local;
 2. exemplo local, quando disponível;
-3. proxy próprio configurado em `window.CRYSTALAR_PROXY_URL`;
-4. snapshot CC0 `LMucko/crystallography-open-database` no Hugging Face Dataset Viewer;
-5. servidores oficiais do COD, quando o navegador permite CORS.
+3. filtro numérico exato no snapshot CC0 `LMucko/crystallography-open-database`;
+4. servidores oficiais do COD, quando o navegador permite CORS;
+5. proxy próprio, quando configurado.
 
-Os proxies CORS públicos genéricos foram removidos. Para uso institucional ou produção, implante `worker/index.js` em uma conta Cloudflare e configure a URL no site.
+As fontes remotas são consultadas de forma concorrente, e a interface não deve permanecer indefinidamente na tela de carregamento.
 
 ## Testes
 
@@ -43,7 +45,7 @@ npm test
 npm run smoke:remote
 ```
 
-O workflow `.github/workflows/quality.yml` verifica sintaxe, funções de parsing/AR e realiza um teste remoto do COD `1506803`, incluindo o cabeçalho CORS.
+O workflow `.github/workflows/quality.yml` verifica sintaxe, funções de parsing/AR e realiza um teste remoto do COD `1506803`, incluindo a validação do CIF e do COD ID.
 
 ## Limitações
 
@@ -51,7 +53,8 @@ O workflow `.github/workflows/quality.yml` verifica sintaxe, funções de parsin
 - ligações são inferidas geometricamente;
 - supercelas grandes podem reduzir o desempenho;
 - o snapshot do Hugging Face é um espelho de terceiros datado de 6 de julho de 2026;
-- para disponibilidade controlada e IDs recém-depositados, use o Worker próprio.
+- IDs recém-depositados podem ainda não existir nesse snapshot;
+- os servidores oficiais do COD podem bloquear leitura por CORS no navegador.
 
 ## Fonte e licença
 
