@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use CrystalAR in teaching or research, please cite this software."
+title: "CrystalAR: an open browser-based CIF and WebAR crystal structure viewer for chemical education"
+type: software
+version: "0.1.0"
+date-released: "2026-07-17"
+authors:
+  - family-names: "Souto"
+    given-names: "André Arigony"
+    orcid: "https://orcid.org/0000-0002-2437-8767"
+repository-code: "https://github.com/arigony/CrystalAR"
+url: "https://arigony.github.io/CrystalAR/"
+license: "MIT"
+keywords:
+  - chemical education
+  - crystallography
+  - CIF
+  - augmented reality
+  - WebAR
+  - Crystallography Open Database
+  - Three.js
