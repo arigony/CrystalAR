@@ -11,6 +11,16 @@ function extractCodId(url) {
   return match?.[1] || "";
 }
 
+function normalizeCIFPayload(text) {
+  const normalized = String(text || "").replace(/\r\n?/g, "\n");
+  const match = normalized.match(/(?:^|\n)\s*(data_[^\s]+[\s\S]*)/i);
+  if (!match) return "";
+  let cif = match[1].trim();
+  const fence = cif.search(/\n```\s*$/m);
+  if (fence > 0) cif = cif.slice(0, fence).trim();
+  return cif;
+}
+
 function looksLikeCIF(text) {
   return /(^|\n)\s*data_/i.test(text) &&
     /_cell_length_a/i.test(text) &&
@@ -33,22 +43,28 @@ function staticCodPath(id) {
 
 function routesFor(id) {
   const staticPath = staticCodPath(id);
-  const targets = [
+  const directTargets = [
     `https://www.crystallography.net/cod/${id}.cif`,
-    `https://crystallography.net/cod/${id}.cif`,
     `https://qiserver.ugr.es/cod/${id}.cif`,
     `https://www.crystallography.net/cod/cif/${staticPath}`,
     `https://qiserver.ugr.es/cod/cif/${staticPath}`
   ];
 
+  // Rota de leitura pública usada quando o servidor COD não libera CORS.
+  const readerTargets = [
+    `https://r.jina.ai/http://www.crystallography.net/cod/${id}.cif`,
+    `https://r.jina.ai/https://qiserver.ugr.es/cod/${id}.cif`
+  ];
+
   return [
-    ...targets,
-    ...targets.slice(0, 3).map(target => `https://corsproxy.io/?url=${encodeURIComponent(target)}`),
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(targets[0])}`
+    ...directTargets,
+    ...readerTargets,
+    `https://corsproxy.io/?url=${encodeURIComponent(directTargets[0])}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(directTargets[0])}`
   ];
 }
 
-async function fetchRoute(route, controller, timeoutMs = 9000) {
+async function fetchRoute(route, controller, timeoutMs = 15000) {
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await nativeFetch(route, {
@@ -58,7 +74,8 @@ async function fetchRoute(route, controller, timeoutMs = 9000) {
       signal: controller.signal
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const text = await response.text();
+    const raw = await response.text();
+    const text = normalizeCIFPayload(raw);
     if (!looksLikeCIF(text)) throw new Error("resposta não reconhecida como CIF");
     return { text, route };
   } finally {
@@ -67,8 +84,9 @@ async function fetchRoute(route, controller, timeoutMs = 9000) {
 }
 
 async function fetchRemoteCIF(id) {
-  const controllers = routesFor(id).map(() => new AbortController());
-  const tasks = routesFor(id).map((route, index) => fetchRoute(route, controllers[index]));
+  const routes = routesFor(id);
+  const controllers = routes.map(() => new AbortController());
+  const tasks = routes.map((route, index) => fetchRoute(route, controllers[index]));
   try {
     return await Promise.any(tasks);
   } finally {
@@ -81,26 +99,32 @@ async function fetchCOD(id) {
 
   try {
     const cached = localStorage.getItem(cacheKey);
-    if (cached && looksLikeCIF(cached)) return cifResponse(cached, "local-cache");
+    if (cached && looksLikeCIF(cached)) return cifResponse(cached, "cache local");
   } catch {
-    // Storage can be disabled in private browsing.
+    // O armazenamento pode estar desabilitado no modo privado.
   }
 
   const localPath = LOCAL_CIF[id];
   if (localPath) {
     const response = await nativeFetch(localPath, { cache: "no-store" });
     if (response.ok) {
-      const text = await response.text();
-      if (looksLikeCIF(text)) return cifResponse(text, "local-example");
+      const text = normalizeCIFPayload(await response.text());
+      if (looksLikeCIF(text)) return cifResponse(text, "exemplo local");
     }
   }
 
   try {
     const result = await fetchRemoteCIF(id);
     try { localStorage.setItem(cacheKey, result.text); } catch {}
-    return cifResponse(result.text, result.route.includes("corsproxy") || result.route.includes("allorigins") ? "cors-proxy" : "cod-server");
-  } catch {
-    throw new TypeError("Não foi possível recuperar o CIF automaticamente em até 9 segundos. Baixe o arquivo na ficha do COD e use a opção ‘Abrir arquivo CIF’.");
+    const route = result.route.includes("r.jina.ai")
+      ? "COD via Jina Reader"
+      : result.route.includes("corsproxy") || result.route.includes("allorigins")
+        ? "COD via proxy CORS"
+        : "servidor COD";
+    return cifResponse(result.text, route);
+  } catch (error) {
+    console.warn("[CrystalAR COD]", error);
+    throw new TypeError("Não foi possível recuperar este CIF automaticamente. Abra a ficha do COD, baixe o arquivo e use ‘Abrir arquivo CIF’. Tente também novamente em alguns segundos.");
   }
 }
 
@@ -110,33 +134,5 @@ window.fetch = function crystalARFetch(input, init = {}) {
   return id ? fetchCOD(id) : nativeFetch(input, init);
 };
 
-// Improve mobile-camera compatibility before app.js installs the AR controls.
-if (navigator.mediaDevices?.getUserMedia) {
-  const nativeGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = async constraints => {
-    try {
-      return await nativeGetUserMedia(constraints);
-    } catch (error) {
-      if (["NotFoundError", "OverconstrainedError"].includes(error?.name)) {
-        return nativeGetUserMedia({ audio: false, video: true });
-      }
-      if (["NotAllowedError", "SecurityError"].includes(error?.name)) {
-        throw new Error("A câmera foi bloqueada. Autorize a câmera nas permissões do navegador e toque em AR novamente.");
-      }
-      if (["NotReadableError", "AbortError"].includes(error?.name)) {
-        throw new Error("A câmera está ocupada por outro aplicativo ou não pôde ser iniciada.");
-      }
-      throw error;
-    }
-  };
-}
-
-const video = document.getElementById("cameraVideo");
-if (video) {
-  video.muted = true;
-  video.playsInline = true;
-  video.setAttribute("playsinline", "");
-}
-
-document.querySelector(".eyebrow")?.replaceChildren("Protótipo v0.1.1");
-await import("./app.js?v=0.1.1");
+document.querySelector(".eyebrow")?.replaceChildren("Protótipo v0.1.2");
+await import("./app.js?v=0.1.2");
