@@ -5,7 +5,8 @@ import {
   looksLikeCIF,
   extractDeclaredCODId,
   validateCODPayload,
-  extractCIFTextFromDatasetResponse
+  extractCIFTextFromDatasetResponse,
+  buildDatasetFilterURL
 } from "../src/cod-client.js";
 
 const cif = `data_1506803
@@ -52,4 +53,11 @@ test("seleciona o COD exato na resposta do Dataset Viewer", () => {
 test("ignora cif_text truncado", () => {
   const payload = { rows: [{ row: { file: 1506803, cif_text: cif }, truncated_cells: ["cif_text"] }] };
   assert.equal(extractCIFTextFromDatasetResponse(payload, "1506803"), "");
+});
+
+test("gera filtro numérico exato para COD ID", () => {
+  const url = buildDatasetFilterURL("1506803");
+  assert.equal(url.pathname, "/filter");
+  assert.equal(url.searchParams.get("where"), '"file"=1506803');
+  assert.equal(url.searchParams.get("length"), "1");
 });
