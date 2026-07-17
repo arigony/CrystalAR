@@ -1,0 +1,47 @@
+# CrystalAR educational fallback derived from COD entry 9012293 metadata.
+# Original structural data authors: Straumanis, M. E.; Aka, E. Z.
+# Original publication: J. Am. Chem. Soc. 1951, 73, 5643-5646.
+# COD data are CC0; acknowledge the original authors.
+data_9012293
+_cod_database_code 9012293
+_chemical_name_common 'Diamond'
+_chemical_name_mineral 'Diamond'
+_chemical_formula_sum 'C'
+_publ_section_title
+;
+Precision determination of lattice parameter, coefficient of thermal expansion and atomic weight of carbon in diamond
+;
+loop_
+_publ_author_name
+'Straumanis, M. E.'
+'Aka, E. Z.'
+_journal_name_full 'Journal of the American Chemical Society'
+_journal_year 1951
+_journal_volume 73
+_journal_page_first 5643
+_journal_page_last 5646
+_cell_length_a 3.5669
+_cell_length_b 3.5669
+_cell_length_c 3.5669
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 45.381
+_cell_formula_units_Z 8
+_space_group_name_H-M_alt 'F d -3 m :1'
+_space_group_IT_number 227
+loop_
+_space_group_symop_operation_xyz
+'x,y,z'
+'x+1/2,y+1/2,z'
+'x+1/2,y,z+1/2'
+'x,y+1/2,z+1/2'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+C1 C 0 0 0 1
+C2 C 1/4 1/4 1/4 1
