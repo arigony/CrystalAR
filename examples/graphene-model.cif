@@ -1,0 +1,26 @@
+data_graphene_model
+# CrystalAR educational 2D model, not a three-dimensional experimental CIF.
+# The in-plane hexagonal lattice parameter is based on experimental graphite/graphene values.
+# c = 20 A is an artificial vacuum spacing used only to represent an isolated monolayer.
+_chemical_name_common 'Graphene monolayer (educational 2D model)'
+_chemical_formula_sum 'C2'
+_space_group_name_H-M_alt 'P 1'
+_space_group_IT_number 1
+_cell_length_a 2.4600
+_cell_length_b 2.4600
+_cell_length_c 20.0000
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 120
+_cell_volume 104.8168
+_cell_formula_units_Z 1
+_publ_section_title 'Educational periodic model of an isolated graphene monolayer'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+C1 C 0.00000000 0.00000000 0.50000000 1
+C2 C 0.33333333 0.66666667 0.50000000 1
