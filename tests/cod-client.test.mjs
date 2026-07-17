@@ -25,6 +25,8 @@ _atom_site_fract_z
 C1 C 0.1 0.2 0.3
 `;
 
+const wrongCif = cif.replaceAll("1506803", "1506804");
+
 test("normaliza payload e reconhece CIF", () => {
   const value = normalizeCIFPayload(`header externo\n${cif}\n\`\`\``);
   assert.equal(looksLikeCIF(value), true);
@@ -37,7 +39,17 @@ test("extrai e valida COD ID", () => {
   assert.throws(() => validateCODPayload(cif, "1506804"), /devolveu COD 1506803/);
 });
 
-test("extrai cif_text da resposta do Dataset Viewer", () => {
-  const payload = { rows: [{ row: { file: 1506803, cif_text: cif }, truncated_cells: [] }] };
-  assert.equal(extractCIFTextFromDatasetResponse(payload), cif.trim());
+test("seleciona o COD exato na resposta do Dataset Viewer", () => {
+  const payload = {
+    rows: [
+      { row: { file: 1506804, cif_text: wrongCif }, truncated_cells: [] },
+      { row: { file: 1506803, cif_text: cif }, truncated_cells: [] }
+    ]
+  };
+  assert.equal(extractCIFTextFromDatasetResponse(payload, "1506803"), cif.trim());
+});
+
+test("ignora cif_text truncado", () => {
+  const payload = { rows: [{ row: { file: 1506803, cif_text: cif }, truncated_cells: ["cif_text"] }] };
+  assert.equal(extractCIFTextFromDatasetResponse(payload, "1506803"), "");
 });
