@@ -1,0 +1,41 @@
+data_9000107
+# CrystalAR educational local derivative.
+# Cell parameters and structure type are based on the cited experimental COD entry.
+# The conventional cell is expanded explicitly for reliable browser visualization.
+_chemical_name_common 'Zinc sulfide (sphalerite, zinc-blende structure)'
+_chemical_formula_sum 'Zn4 S4'
+_space_group_name_H-M_alt 'F -4 3 m'
+_space_group_IT_number 216
+_cell_length_a 5.4093
+_cell_length_b 5.4093
+_cell_length_c 5.4093
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 158.2790
+_cell_formula_units_Z 4
+_cod_database_code 9000107
+_publ_section_title 'Crystal structure data corresponding to COD 9000107'
+_journal_name_full 'American Mineralogist'
+_journal_year 1961
+_journal_volume 46
+_journal_page_first 1399
+_journal_page_last 1411
+loop_
+_publ_author_name
+'Skinner, B. J.'
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Zn1 Zn 0 0 0 1
+Zn2 Zn 0 0.5 0.5 1
+Zn3 Zn 0.5 0 0.5 1
+Zn4 Zn 0.5 0.5 0 1
+S1 S 0.25 0.25 0.25 1
+S2 S 0.25 0.75 0.75 1
+S3 S 0.75 0.25 0.75 1
+S4 S 0.75 0.75 0.25 1
