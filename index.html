@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="CrystalAR — visualizador educacional de estruturas cristalográficas CIF conectado ao Crystallography Open Database." />
-  <title>CrystalAR — CIF + COD em 3D e AR</title>
-  <link rel="stylesheet" href="style.css?v=0.2.1" />
+  <meta name="description" content="CrystalAR — galeria educacional de estruturas cristalográficas em 3D e realidade aumentada, com CIFs locais derivados de dados experimentais do COD." />
+  <title>CrystalAR — Galeria cristalográfica 3D e AR</title>
+  <link rel="stylesheet" href="style.css?v=0.3.0" />
   <script type="importmap">
   {
     "imports": {
@@ -25,7 +25,7 @@
       <div class="brand-mark">C</div>
       <div>
         <h1>Crystal<span>AR</span></h1>
-        <p>CIF · COD · cela unitária · supercela · WebAR</p>
+        <p>Galeria experimental · CIF · cela unitária · supercela · WebAR</p>
       </div>
     </div>
     <div class="view-actions" aria-label="Modos de visualização">
@@ -38,30 +38,83 @@
   <aside class="control-panel" aria-label="Controles do CrystalAR">
     <div class="panel-heading">
       <div>
-        <span class="eyebrow">Protótipo v0.2.1</span>
-        <h2>Carregar estrutura</h2>
+        <span class="eyebrow">Versão v0.3.0</span>
+        <h2>Galeria cristalográfica</h2>
       </div>
       <button id="collapseControls" class="icon-button" type="button" aria-label="Recolher controles">−</button>
     </div>
 
     <div id="controlBody" class="control-body">
+      <p class="gallery-intro">
+        Exemplos locais e estáveis. O selo <strong>Experimental COD</strong> identifica modelos derivados de determinações experimentais; o grafeno é identificado separadamente como modelo 2D.
+      </p>
+
+      <section class="example-group" aria-labelledby="carbonTitle">
+        <div class="example-group-heading">
+          <h3 id="carbonTitle">Formas do carbono</h3>
+          <span>rede 3D, camadas e monocamada</span>
+        </div>
+        <div class="example-grid">
+          <button class="example-card" type="button" data-example="diamond" aria-pressed="false">
+            <strong>Diamante</strong><span class="badge experimental">Experimental COD</span>
+          </button>
+          <button class="example-card" type="button" data-example="graphite" aria-pressed="false">
+            <strong>Grafite 2H</strong><span class="badge experimental">Experimental COD</span>
+          </button>
+          <button class="example-card" type="button" data-example="graphene" aria-pressed="false">
+            <strong>Grafeno</strong><span class="badge model">Modelo 2D</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="example-group" aria-labelledby="ionicTitle">
+        <div class="example-group-heading">
+          <h3 id="ionicTitle">Sólidos iônicos</h3>
+          <span>coordenação e tipos estruturais</span>
+        </div>
+        <div class="example-grid">
+          <button class="example-card" type="button" data-example="nacl" aria-pressed="false">
+            <strong>NaCl</strong><span class="badge experimental">Sal-gema · COD</span>
+          </button>
+          <button class="example-card" type="button" data-example="cscl" aria-pressed="false">
+            <strong>CsCl</strong><span class="badge experimental">Tipo CsCl · COD</span>
+          </button>
+          <button class="example-card" type="button" data-example="mgo" aria-pressed="false">
+            <strong>MgO</strong><span class="badge experimental">Periclásio · COD</span>
+          </button>
+          <button class="example-card" type="button" data-example="caf2" aria-pressed="false">
+            <strong>CaF₂</strong><span class="badge experimental">Fluorita · COD</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="example-group" aria-labelledby="znsTitle">
+        <div class="example-group-heading">
+          <h3 id="znsTitle">Polimorfos do ZnS</h3>
+          <span>mesma coordenação, empilhamento diferente</span>
+        </div>
+        <div class="example-grid">
+          <button class="example-card" type="button" data-example="znsSphalerite" aria-pressed="false">
+            <strong>Blenda de zinco</strong><span class="badge experimental">Cúbica · COD</span>
+          </button>
+          <button class="example-card" type="button" data-example="znsWurtzite" aria-pressed="false">
+            <strong>Wurtzita 2H</strong><span class="badge experimental">Hexagonal · COD</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="divider"><span>buscar outra estrutura</span></div>
+
       <form id="codForm" class="stack">
         <label for="codId">COD ID</label>
         <div class="input-row">
           <input id="codId" inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8" value="9012293" aria-describedby="codHelp" />
           <button id="searchButton" class="primary" type="submit">Buscar</button>
         </div>
-        <small id="codHelp">Exemplo: 1506803 (resveratrol)</small>
+        <small id="codHelp">A busca remota depende da disponibilidade e das permissões do servidor COD.</small>
       </form>
 
-      <div class="examples" aria-label="Exemplos COD">
-        <button type="button" data-cod="9012293">Diamante</button>
-        <button type="button" data-cod="5910030">BaO</button>
-        <button type="button" data-cod="5910063">CoFe₂O₄</button>
-        <button type="button" data-cod="1506803">Resveratrol</button>
-      </div>
-
-      <div class="divider"><span>ou</span></div>
+      <div class="divider"><span>ou abrir arquivo</span></div>
 
       <label class="upload-box" for="cifFile">
         <strong>Abrir arquivo CIF</strong>
@@ -98,7 +151,7 @@
         <button id="downloadCif" class="secondary" type="button" disabled>Baixar CIF</button>
       </div>
 
-      <p id="status" class="status" role="status" aria-live="polite">Pronto para carregar uma estrutura.</p>
+      <p id="status" class="status" role="status" aria-live="polite">Carregando a galeria local…</p>
     </div>
   </aside>
 
@@ -108,14 +161,14 @@
       <div class="info-summary">
         <h2 id="structureName">CrystalAR</h2>
         <p id="structureFormula">Aguardando estrutura</p>
-        <small id="structureMeta">COD ou upload de CIF</small>
+        <small id="structureMeta">Galeria local, COD ou upload de CIF</small>
       </div>
       <span class="chevron">⌃</span>
     </button>
     <div class="info-body">
       <div id="infoGrid" class="info-grid"></div>
       <div id="citationBox" class="citation-box hidden"></div>
-      <small class="source-note">Dados COD: CC0. Reconheça os autores originais dos dados estruturais.</small>
+      <small class="source-note">Arquivos locais experimentais: derivados de entradas COD CC0, com COD ID e referência preservados. Grafeno: modelo 2D explicitamente identificado.</small>
     </div>
   </section>
 
@@ -128,7 +181,7 @@
 
   <div id="toastBox" class="toast-box" aria-live="polite"></div>
 
-  <script src="src/camera-toggle.js?v=0.2.1"></script>
-  <script type="module" src="src/app.js?v=0.2.1"></script>
+  <script src="src/camera-toggle.js?v=0.3.0"></script>
+  <script type="module" src="src/app.js?v=0.3.0"></script>
 </body>
 </html>
