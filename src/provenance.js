@@ -86,6 +86,22 @@
     if (officialButton) officialButton.disabled = !current.uri;
   }
 
+  function updateUriPreview() {
+    const input = $("codId");
+    const preview = $("codUriPreview");
+    if (!input || !preview) return;
+    const id = validCodId(input.value);
+    preview.textContent = id ? officialUri(id) : "Digite um COD ID com 7 ou 8 algarismos.";
+    preview.classList.toggle("invalid", !id);
+  }
+
+  function syncCodInput(codId) {
+    const input = $("codId");
+    if (!input) return;
+    input.value = codId || "";
+    updateUriPreview();
+  }
+
   async function updateHash(text, requestId) {
     try {
       const hash = await sha256Text(text);
@@ -112,6 +128,7 @@
       hash: "calculando…",
       filename: example.path.split("/").pop()
     };
+    syncCodInput(example.codId);
     render();
     try {
       const response = await fetch(example.path, { cache: "no-store" });
@@ -144,17 +161,9 @@
       hash: "calculando…",
       filename: file.name
     };
+    if (codId) syncCodInput(codId);
     render();
     await updateHash(text, requestId);
-  }
-
-  function updateUriPreview() {
-    const input = $("codId");
-    const preview = $("codUriPreview");
-    if (!input || !preview) return;
-    const id = validCodId(input.value);
-    preview.textContent = id ? officialUri(id) : "Digite um COD ID com 7 ou 8 algarismos.";
-    preview.classList.toggle("invalid", !id);
   }
 
   function openEnteredCod() {
@@ -165,9 +174,8 @@
       return;
     }
     const uri = officialUri(id);
-    const opened = window.open(uri, "_blank", "noopener,noreferrer");
-    if (!opened) showToast("O navegador bloqueou a nova guia. Permita pop-ups e tente novamente.", "error");
-    else showToast("URI oficial do COD aberta. Salve o arquivo CIF e carregue-o no passo 2.", "success");
+    window.open(uri, "_blank", "noopener,noreferrer");
+    showToast("URI oficial do COD aberta. Salve o arquivo CIF e carregue-o no passo 2.", "success");
   }
 
   function provenanceText() {
