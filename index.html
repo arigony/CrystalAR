@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="CrystalAR — galeria educacional de estruturas cristalográficas em 3D e realidade aumentada, com CIFs locais derivados de dados experimentais do COD." />
+  <meta name="description" content="CrystalAR — galeria educacional de estruturas cristalográficas em 3D e realidade aumentada, com CIFs locais, proveniência e fluxo reproduzível para dados do COD." />
   <title>CrystalAR — Galeria cristalográfica 3D e AR</title>
-  <link rel="stylesheet" href="style.css?v=0.3.0" />
+  <link rel="stylesheet" href="style.css?v=0.4.0" />
+  <link rel="stylesheet" href="style-v040.css?v=0.4.0" />
   <script type="importmap">
   {
     "imports": {
@@ -25,7 +26,7 @@
       <div class="brand-mark">C</div>
       <div>
         <h1>Crystal<span>AR</span></h1>
-        <p>Galeria experimental · CIF · cela unitária · supercela · WebAR</p>
+        <p>Galeria experimental · CIF · proveniência · cela unitária · supercela · WebAR</p>
       </div>
     </div>
     <div class="view-actions" aria-label="Modos de visualização">
@@ -38,7 +39,7 @@
   <aside class="control-panel" aria-label="Controles do CrystalAR">
     <div class="panel-heading">
       <div>
-        <span class="eyebrow">Versão v0.3.0</span>
+        <span class="eyebrow">Versão v0.4.0</span>
         <h2>Galeria cristalográfica</h2>
       </div>
       <button id="collapseControls" class="icon-button" type="button" aria-label="Recolher controles">−</button>
@@ -46,7 +47,7 @@
 
     <div id="controlBody" class="control-body">
       <p class="gallery-intro">
-        Exemplos locais e estáveis. O selo <strong>Experimental COD</strong> identifica modelos derivados de determinações experimentais; o grafeno é identificado separadamente como modelo 2D.
+        Exemplos locais, estáveis e versionados. O selo <strong>Experimental COD</strong> identifica modelos derivados de determinações experimentais; o grafeno é identificado separadamente como modelo 2D.
       </p>
 
       <section class="example-group" aria-labelledby="carbonTitle">
@@ -103,24 +104,43 @@
         </div>
       </section>
 
-      <div class="divider"><span>buscar outra estrutura</span></div>
+      <div class="divider"><span>obter outro CIF no COD</span></div>
 
-      <form id="codForm" class="stack">
-        <label for="codId">COD ID</label>
-        <div class="input-row">
-          <input id="codId" inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8" value="9012293" aria-describedby="codHelp" />
-          <button id="searchButton" class="primary" type="submit">Buscar</button>
+      <section class="cod-workflow" aria-labelledby="codWorkflowTitle">
+        <div class="workflow-heading">
+          <span class="step-number">1</span>
+          <div>
+            <h3 id="codWorkflowTitle">Abrir a URI oficial</h3>
+            <p>O CrystalAR não baixa dados do COD automaticamente. A URI oficial será aberta em outra guia; salve o arquivo <code>.cif</code> no dispositivo.</p>
+          </div>
         </div>
-        <small id="codHelp">A busca remota depende da disponibilidade e das permissões do servidor COD.</small>
-      </form>
 
-      <div class="divider"><span>ou abrir arquivo</span></div>
+        <form id="codForm" class="stack">
+          <label for="codId">COD ID</label>
+          <div class="input-row">
+            <input id="codId" inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8" value="9012293" aria-describedby="codHelp codUriPreview" />
+            <button id="searchButton" class="primary" type="submit">Abrir CIF oficial</button>
+          </div>
+          <code id="codUriPreview" class="uri-preview">https://www.crystallography.net/cod/9012293.cif</code>
+          <button id="copyCodUri" class="secondary full-width" type="button">Copiar URI oficial</button>
+          <small id="codHelp">A origem dos dados permanece explícita e o arquivo usado pode ser arquivado junto com a atividade.</small>
+        </form>
+      </section>
 
-      <label class="upload-box" for="cifFile">
-        <strong>Abrir arquivo CIF</strong>
-        <span>Processado localmente no navegador</span>
-        <input id="cifFile" type="file" accept=".cif,.mcif,text/plain,chemical/x-cif" />
-      </label>
+      <section class="upload-step" aria-labelledby="uploadStepTitle">
+        <div class="workflow-heading compact">
+          <span class="step-number">2</span>
+          <div>
+            <h3 id="uploadStepTitle">Abrir o CIF baixado</h3>
+            <p>O arquivo é processado localmente pelo navegador e não é enviado para outro servidor.</p>
+          </div>
+        </div>
+        <label class="upload-box" for="cifFile">
+          <strong>Selecionar arquivo CIF</strong>
+          <span>Compatível com arquivos .cif e .mcif</span>
+          <input id="cifFile" type="file" accept=".cif,.mcif,text/plain,chemical/x-cif" />
+        </label>
+      </section>
 
       <div class="settings-grid">
         <label>
@@ -148,7 +168,7 @@
 
       <div class="action-row">
         <button id="resetView" class="secondary" type="button">Centralizar</button>
-        <button id="downloadCif" class="secondary" type="button" disabled>Baixar CIF</button>
+        <button id="downloadCif" class="secondary" type="button" disabled>Baixar CIF carregado</button>
       </div>
 
       <p id="status" class="status" role="status" aria-live="polite">Carregando a galeria local…</p>
@@ -161,14 +181,37 @@
       <div class="info-summary">
         <h2 id="structureName">CrystalAR</h2>
         <p id="structureFormula">Aguardando estrutura</p>
-        <small id="structureMeta">Galeria local, COD ou upload de CIF</small>
+        <small id="structureMeta">Galeria local ou CIF aberto pelo usuário</small>
       </div>
       <span class="chevron">⌃</span>
     </button>
     <div class="info-body">
       <div id="infoGrid" class="info-grid"></div>
       <div id="citationBox" class="citation-box hidden"></div>
-      <small class="source-note">Arquivos locais experimentais: derivados de entradas COD CC0, com COD ID e referência preservados. Grafeno: modelo 2D explicitamente identificado.</small>
+
+      <section class="provenance-panel" aria-labelledby="provenanceTitle">
+        <div class="provenance-heading">
+          <div>
+            <span class="eyebrow">Rastreabilidade</span>
+            <h3 id="provenanceTitle">Proveniência do arquivo visualizado</h3>
+          </div>
+          <span class="reproducible-badge">Reprodutível</span>
+        </div>
+        <div id="provenanceGrid" class="provenance-grid">
+          <div><span>Tipo</span><strong id="provType">—</strong></div>
+          <div><span>COD ID</span><strong id="provCodId">—</strong></div>
+          <div class="wide"><span>URI oficial</span><strong id="provUri">—</strong></div>
+          <div><span>Incorporação</span><strong id="provDate">—</strong></div>
+          <div><span>CrystalAR</span><strong id="provVersion">v0.4.0</strong></div>
+          <div class="hash-item wide"><span>SHA-256 do texto CIF carregado</span><strong id="provHash">calculando…</strong></div>
+        </div>
+        <div class="provenance-actions">
+          <button id="openOfficialCif" class="secondary" type="button" disabled>Abrir CIF oficial</button>
+          <button id="copyProvenance" class="secondary" type="button">Copiar proveniência</button>
+        </div>
+      </section>
+
+      <small class="source-note">Arquivos experimentais da galeria: derivados de entradas COD CC0, com COD ID e referência preservados. O navegador não consulta o COD automaticamente. Grafeno: modelo 2D explicitamente identificado.</small>
     </div>
   </section>
 
@@ -181,14 +224,8 @@
 
   <div id="toastBox" class="toast-box" aria-live="polite"></div>
 
-  <script src="src/camera-toggle.js?v=0.3.0"></script>
-  <script type="module" src="src/app.js?v=0.3.0"></script>
-  <script>
-    window.addEventListener("load", () => {
-      document.querySelector('[data-example="graphene"]')?.addEventListener("click", () => {
-        document.getElementById("supercell").value = "1";
-      });
-    });
-  </script>
+  <script src="src/camera-toggle.js?v=0.4.0"></script>
+  <script src="src/provenance.js?v=0.4.0"></script>
+  <script type="module" src="src/app.js?v=0.4.0"></script>
 </body>
 </html>
