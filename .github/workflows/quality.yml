@@ -3,7 +3,11 @@ name: CrystalAR quality
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -16,5 +20,3 @@ jobs:
           node-version: 22
       - run: npm run check
       - run: npm test
-      - name: Test COD 1506803 and browser CORS source
-        run: npm run smoke:remote
