@@ -1,11 +1,10 @@
 {
   "name": "crystalar",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/app.js && node --check src/renderer.js && node --check src/cod-client.js && node --check src/ar-logic.js && node --check src/camera-toggle.js",
-    "smoke:remote": "node tests/remote-smoke.mjs"
+    "check": "node --check src/app.js && node --check src/provenance.js && node --check src/renderer.js && node --check src/cod-client.js && node --check src/ar-logic.js && node --check src/camera-toggle.js"
   }
 }
