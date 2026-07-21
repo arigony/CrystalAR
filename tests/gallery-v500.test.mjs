@@ -9,6 +9,14 @@ const packageJson = JSON.parse(await readFile(new URL("../package.json", import.
 
 const keys = ["sulfurAlpha", "sulfurBeta", "sulfurGamma", "mof5", "hkust1", "zif8"];
 
+function exampleBlock(key) {
+  const start = app.indexOf(`  ${key}: {`);
+  assert.notEqual(start, -1, `entrada ${key} ausente em src/app.js`);
+  const end = app.indexOf("\n  },", start);
+  assert.notEqual(end, -1, `fim da entrada ${key} ausente em src/app.js`);
+  return app.slice(start, end + 5);
+}
+
 test("CrystalAR 5.0.0 apresenta polimorfismo e materiais porosos", () => {
   assert.equal(packageJson.version, "5.0.0");
   assert.match(index, /Enxofre molecular/);
@@ -18,15 +26,17 @@ test("CrystalAR 5.0.0 apresenta polimorfismo e materiais porosos", () => {
 
 for (const key of keys) {
   test(`exemplo ${key} está conectado à interface e à proveniência`, () => {
-    assert.match(index, new RegExp(`data-example=["']${key}["']`));
-    assert.match(app, new RegExp(`\b${key}:`));
-    assert.match(provenance, new RegExp(`\b${key}:`));
+    assert.ok(index.includes(`data-example="${key}"`));
+    assert.ok(app.includes(`  ${key}: {`));
+    assert.ok(provenance.includes(`    ${key}: {`));
   });
 }
 
 test("MOFs usam wireframe e cela 1 × 1 × 1", () => {
   for (const key of ["mof5", "hkust1", "zif8"]) {
-    assert.match(app, new RegExp(`${key}:[\s\S]*?representation: ["']wire["'][\s\S]*?supercell: 1`));
+    const block = exampleBlock(key);
+    assert.match(block, /representation: "wire"/);
+    assert.match(block, /supercell: 1/);
   }
 });
 
