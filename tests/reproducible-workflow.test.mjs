@@ -8,8 +8,8 @@ const watchdog = await readFile(new URL("../src/runtime-watchdog.js", import.met
 const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
 const renderer = await readFile(new URL("../src/renderer.js", import.meta.url), "utf8");
 
-test("a interface apresenta a versão 0.4.1 e o fluxo em duas etapas", () => {
-  assert.match(index, /Versão v0\.5\.0/);
+test("a interface apresenta CrystalAR 5.0 e o fluxo em duas etapas", () => {
+  assert.match(index, /Versão v5\.0\.0/);
   assert.match(index, /Abrir a URI oficial/);
   assert.match(index, /Abrir o CIF baixado/);
   assert.match(index, /O CrystalAR não baixa dados do COD automaticamente/);
@@ -22,23 +22,26 @@ test("o formulário abre a URI oficial sem iniciar busca remota", () => {
   assert.doesNotMatch(workflow, /fetch\(officialUri/);
 });
 
-test("a proveniência inclui versão, COD ID, URI e SHA-256", () => {
+test("a proveniência inclui versão, identificador, URI e SHA-256", () => {
   assert.match(index, /SHA-256 do texto CIF carregado/);
   assert.match(index, /Copiar proveniência/);
   assert.match(workflow, /crypto\.subtle\.digest\("SHA-256"/);
-  assert.match(workflow, /Versão do aplicativo: CrystalAR/);
+  assert.match(workflow, /APP_VERSION = "v5\.0\.0"/);
+  assert.match(workflow, /EDUSIF/);
+  assert.match(workflow, /FIQCEN/);
+  assert.match(workflow, /OFERUN/);
 });
 
 test("o carregamento 3D usa jsDelivr e possui recuperação visível", () => {
   assert.match(index, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
   assert.match(app, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
   assert.match(renderer, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
-  assert.match(index, /runtime-watchdog\.js\?v=0\.5\.0/);
+  assert.match(index, /runtime-watchdog\.js\?v=5\.0\.0/);
   assert.match(watchdog, /A estrutura inicial não foi carregada/);
   assert.match(index, /Recarregar visualizador/);
 });
 
-test("a galeria mantém dezesseis estruturas locais", () => {
+test("a galeria mantém quinze estruturas locais", () => {
   const exampleButtons = index.match(/data-example=/g) || [];
-  assert.equal(exampleButtons.length, 16);
+  assert.equal(exampleButtons.length, 15);
 });

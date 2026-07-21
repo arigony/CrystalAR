@@ -59,36 +59,31 @@ const EDUCATIONAL_EXAMPLES = {
     teachingNote: "Outro polimorfo monoclínico do S₈. Compare a forma da cela e o empacotamento com α-S₈ e β-S₈.",
     representation: "ball-stick", showBonds: true, supercell: 1
   },
-  sulfurS6: {
-    label: "Ciclo-S₆",
-    path: "examples/sulfur-s6-9012361.cif",
-    codId: "9012361",
-    provenance: "Determinação experimental COD 9012361",
-    teachingNote: "Alótropo molecular constituído por anéis S₆. Aqui muda a identidade molecular, não apenas o empacotamento do S₈.",
-    representation: "ball-stick", showBonds: true, supercell: 2
-  },
-  iodine: {
-    label: "Iodo sólido — I₂",
-    path: "examples/iodine-9008595.cif",
-    codId: "9008595",
-    provenance: "Determinação experimental COD 9008595",
-    teachingNote: "Cristal molecular formado por moléculas discretas I₂. A ligação intramolecular I–I é distinta das interações intermoleculares no sólido.",
-    representation: "ball-stick", showBonds: true, supercell: 2
-  },
   mof5: {
     label: "MOF-5 — IRMOF-1",
-    path: "examples/mof5-1516287.cif",
-    codId: "1516287",
-    provenance: "Determinação experimental COD 1516287",
-    teachingNote: "Rede metal-orgânica cúbica formada por unidades Zn₄O conectadas por ligantes tereftalato (BDC). Observe os grandes vazios periódicos.",
+    path: "examples/mof5-clean.cif",
+    codId: "",
+    provenance: "Modelo educacional limpo derivado da estrutura pública EDUSIF",
+    teachingNote: "Nó metálico: Zn₄O. Ligante: tereftalato (BDC). Topologia: pcu. Conectividade do nó: 6. A cela primitiva evidencia grandes cavidades cúbicas.",
+    sourceLabel: "galeria local · modelo educacional EDUSIF",
+    representation: "wire", showBonds: true, supercell: 1
+  },
+  hkust1: {
+    label: "HKUST-1 — Cu-BTC",
+    path: "examples/hkust1-clean.cif",
+    codId: "",
+    provenance: "Modelo educacional limpo derivado da estrutura pública FIQCEN",
+    teachingNote: "Nó metálico: unidade dimérica Cu–Cu do tipo paddlewheel. Ligante: benzeno-1,3,5-tricarboxilato (BTC). Topologia: tbo. Após ativação, pode apresentar sítios metálicos abertos.",
+    sourceLabel: "galeria local · modelo educacional FIQCEN",
     representation: "wire", showBonds: true, supercell: 1
   },
   zif8: {
     label: "ZIF-8",
-    path: "examples/zif8-7111973.cif",
-    codId: "7111973",
-    provenance: "Determinação experimental COD 7111973",
-    teachingNote: "Rede de Zn tetraédrico e 2-metilimidazolato, com topologia do tipo sodalita. É um exemplo de MOF com conectividade semelhante à de zeólitas.",
+    path: "examples/zif8-clean.cif",
+    codId: "",
+    provenance: "Modelo educacional limpo derivado da estrutura pública OFERUN",
+    teachingNote: "Nó: Zn tetraédrico. Ligante: 2-metilimidazolato. Topologia: sod, semelhante à sodalita. As cavidades são conectadas por janelas estreitas.",
+    sourceLabel: "galeria local · modelo educacional OFERUN",
     representation: "wire", showBonds: true, supercell: 1
   },
   nacl: {
@@ -288,7 +283,7 @@ async function loadLocalExample(key) {
     if (!response.ok) throw new Error(`Arquivo local respondeu HTTP ${response.status}.`);
     const text = await response.text();
     processCIF(text, example.path.split("/").pop(), {
-      source: example.codId ? `galeria local · COD ${example.codId}` : "galeria local · modelo 2D",
+      source: example.sourceLabel || (example.codId ? `galeria local · COD ${example.codId}` : "galeria local · modelo educacional"),
       displayName: example.label,
       provenance: example.provenance,
       teachingNote: example.teachingNote,

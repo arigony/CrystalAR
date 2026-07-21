@@ -1,31 +1,28 @@
 # CrystalAR
 
-**CrystalAR** é um visualizador educacional aberto para estruturas cristalográficas em 3D e realidade aumentada no navegador.
+**CrystalAR** é um visualizador educacional aberto de estruturas cristalográficas em 3D e realidade aumentada diretamente no navegador.
 
 ## Versão
 
-`v0.5.0` — galeria expandida com 16 estruturas, proveniência reproduzível e funcionamento independente de CORS.
+`5.0.0` — **Polimorfismo, sólidos cristalinos e materiais porosos**.
 
-## Galeria didática local
+A versão 5.0 reorganiza a galeria em cinco famílias e amplia o escopo para quinze estruturas, distinguindo de forma explícita dados cristalográficos experimentais, derivados educacionais e modelos limpos de materiais porosos.
+
+## Galeria didática
 
 ### Formas do carbono
 
-- diamante — COD `9012293`;
-- grafite 2H — COD `1200017`;
+- diamante — derivado do COD `9012293`;
+- grafite 2H — derivado do COD `1200017`;
 - grafeno — modelo periódico 2D educacional com vácuo artificial.
 
-### Enxofre molecular
+### Enxofre molecular: polimorfismo de S₈
 
 - α-S₈ ortorrômbico — COD `9011362`;
 - β-S₈ monoclínico — COD `4124791`;
-- γ-S₈ monoclínico — COD `2002079`;
-- ciclo-S₆ — COD `9012361`.
+- γ-S₈ monoclínico — COD `2002079`.
 
-A comparação diferencia **polimorfismo** — mesma molécula S₈ em empacotamentos diferentes — de **alotropia molecular**, representada pela mudança de S₈ para S₆.
-
-### Cristal molecular
-
-- iodo sólido, I₂ — COD `9008595`.
+As três estruturas possuem a mesma unidade molecular S₈, mas diferem no empacotamento cristalino. Isso permite separar **polimorfismo** de mudança de composição molecular.
 
 ### Sólidos iônicos
 
@@ -36,56 +33,77 @@ A comparação diferencia **polimorfismo** — mesma molécula S₈ em empacotam
 
 ### Redes metal-orgânicas
 
-- MOF-5/IRMOF-1 — COD `1516287`;
-- ZIF-8 — COD `7111973`.
+- MOF-5/IRMOF-1 — modelo limpo identificado por `EDUSIF`;
+- HKUST-1/Cu-BTC — modelo limpo identificado por `FIQCEN`;
+- ZIF-8 — modelo limpo identificado por `OFERUN`.
 
-Os MOFs são abertos inicialmente em `1×1×1` e wireframe para reduzir o custo gráfico em celulares.
+Os modelos de MOFs são derivados educacionais sem solventes, com ocupação integral e simetria P1 explícita. Não são apresentados como CIFs experimentais intactos. A visualização inicial usa wireframe e cela `1 × 1 × 1` para reduzir o custo gráfico em celulares.
 
 ### Polimorfos do ZnS
 
 - blenda de zinco — COD `9000107`;
 - wurtzita 2H — COD `1100044`.
 
-## Fluxo reproduzível para outros CIFs
+## Metadados didáticos dos MOFs
 
-1. informe o COD ID;
-2. abra a URI oficial do COD;
-3. salve o CIF no dispositivo;
-4. abra o arquivo localmente no CrystalAR;
-5. registre COD ID, URI, data, versão do aplicativo e SHA-256.
+Cada cartão informa o nó metálico, o ligante, a topologia e a característica estrutural principal:
 
-O navegador não consulta o COD automaticamente. Essa arquitetura segue a recomendação técnica recebida da equipe do COD e mantém a origem dos dados explícita.
+| Estrutura | Nó | Ligante | Topologia | Destaque |
+| --- | --- | --- | --- | --- |
+| MOF-5 | Zn₄O | tereftalato (BDC) | pcu | grandes cavidades cúbicas |
+| HKUST-1 | Cu₂ paddlewheel | BTC | tbo | sítios metálicos abertos após ativação |
+| ZIF-8 | Zn tetraédrico | 2-metilimidazolato | sod | cavidades conectadas por janelas estreitas |
+
+## Proveniência e reprodutibilidade
+
+Para cada estrutura, o CrystalAR apresenta, quando disponível:
+
+- classificação do arquivo;
+- COD ID ou identificador estrutural do modelo;
+- URI da fonte;
+- versão do aplicativo;
+- data de incorporação;
+- SHA-256 do texto CIF processado;
+- referência cristalográfica contida no arquivo.
+
+Arquivos experimentais adicionais continuam sendo obtidos pelo fluxo em duas etapas: abrir a URI oficial do COD, salvar o CIF e carregá-lo localmente. O arquivo não é enviado para outro servidor.
 
 ## Funcionalidades
 
 - galeria local categorizada e responsiva;
 - ball-and-stick, space-filling e wireframe;
-- cela unitária e supercelas `1×1×1`, `2×2×2` e `3×3×3`;
-- upload local de `.cif` e `.mcif`;
-- cálculo de SHA-256 no navegador;
-- painel de metadados, nota didática, referência e proveniência;
-- WebAR com câmera, rastreamento de mão e fallback por toque ou mouse.
+- cela unitária e supercelas `1 × 1 × 1`, `2 × 2 × 2` e `3 × 3 × 3`;
+- upload de `.cif` e `.mcif` processado no navegador;
+- cálculo de SHA-256;
+- painel de metadados, referência, nota didática e proveniência;
+- WebAR com câmera, rastreamento de mão e fallback por toque, mouse e roda;
+- teste automatizado de inicialização em navegador real.
 
 ## Testes
 
 ```bash
 npm run check
 npm test
+npm run smoke:browser
 ```
 
-Os testes verificam sintaxe, inicialização real em navegador, parser, galeria, CIFs locais, proveniência e conexão entre os cartões e seus arquivos.
+Os testes verificam os quinze CIFs, parâmetros de cela, coordenadas cartesianas, conexão entre cartões e arquivos, proveniência, escopo da versão e inicialização completa no Chrome.
+
+## Escopo adiado
+
+S₆ e UiO-66 não fazem parte do lançamento 5.0.0. S₆ depende de validação adicional da seleção estrutural; UiO-66 exige tratamento explícito de desordem, ocupações fracionárias e hóspedes. Modos de superfície de poros e separação automática entre nó, ligante e hóspedes ficam para uma versão posterior.
 
 ## Limitações
 
 - o parser cobre CIF 1.1 comum, não todos os casos avançados;
 - ligações são inferidas geometricamente;
-- ocupações parciais e desordem podem exigir curadoria adicional;
-- células de MOFs são grandes e podem reduzir o desempenho em celulares;
-- o grafeno é um modelo 2D educacional, não uma determinação cristalográfica 3D.
+- o parser registra ocupações e grupos de desordem, mas não resolve automaticamente configurações desordenadas;
+- os modelos limpos de MOFs representam a rede para fins didáticos e não preservam solventes ou desordem da determinação original;
+- supercelas grandes podem reduzir o desempenho em celulares.
 
 ## Fonte e licença
 
-Código: MIT. Dados locais experimentais: entradas COD disponibilizadas em CC0, com reconhecimento dos autores originais e dos COD IDs.
+Código: MIT. Estruturas derivadas do COD mantêm identificadores e referências. Os modelos de MOFs são derivados da coleção pública usada no `mlip-arena`, com os identificadores estruturais preservados.
 
 ## Autor
 

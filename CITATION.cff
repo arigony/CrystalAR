@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use CrystalAR in teaching or research, please cite this software."
 title: "CrystalAR: an open browser-based CIF and WebAR crystal structure viewer for chemical education"
 type: software
-version: "0.5.0"
+version: "5.0.0"
 date-released: "2026-07-21"
 authors:
   - family-names: "Souto"

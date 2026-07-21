@@ -11,10 +11,9 @@ const examples = [
   ["sulfur-alpha-9011362.cif", "9011362", null],
   ["sulfur-beta-4124791.cif", "4124791", null],
   ["sulfur-gamma-2002079.cif", "2002079", null],
-  ["sulfur-s6-9012361.cif", "9012361", null],
-  ["iodine-9008595.cif", "9008595", null],
-  ["mof5-1516287.cif", "1516287", null],
-  ["zif8-7111973.cif", "7111973", null],
+  ["mof5-clean.cif", "EDUSIF_clean", null],
+  ["hkust1-clean.cif", "FIQCEN_clean", null],
+  ["zif8-clean.cif", "OFERUN_clean", null],
   ["nacl-1000041.cif", "1000041", 8],
   ["cscl-9008789.cif", "9008789", 2],
   ["mgo-1011173.cif", "1011173", 8],
@@ -42,4 +41,12 @@ test("grafeno é explicitamente identificado como modelo educacional", async () 
   assert.match(text, /artificial vacuum spacing/i);
   assert.match(text, /4 x 4 in-plane patch/i);
   assert.doesNotMatch(text, /_cod_database_code\s+\d/i);
+});
+
+test("MOFs são marcados como modelos educacionais limpos", async () => {
+  for (const filename of ["mof5-clean.cif", "hkust1-clean.cif", "zif8-clean.cif"]) {
+    const text = await readFile(new URL(`../examples/${filename}`, import.meta.url), "utf8");
+    assert.match(text, /cleaned educational model/i);
+    assert.doesNotMatch(text, /_cod_database_code\s+\d/i);
+  }
 });
