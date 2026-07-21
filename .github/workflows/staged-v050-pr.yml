@@ -34,15 +34,10 @@ jobs:
                   captured = []
                   while index < len(lines):
                       line = lines[index]
-                      if line.startswith('          '):
-                          captured.append(line[10:])
-                          index += 1
-                          continue
-                      if not line.strip():
-                          captured.append('')
-                          index += 1
-                          continue
-                      break
+                      if line.startswith('      - name:') or line.startswith('      - uses:'):
+                          break
+                      captured.append(line[10:] if line.startswith('          ') else line)
+                      index += 1
                   scripts.append('\n'.join(captured).rstrip() + '\n')
                   continue
               index += 1
