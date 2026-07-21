@@ -1,0 +1,32 @@
+name: Verify published CrystalAR v0.5.0
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Confirm live v0.5.0 gallery
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://arigony.github.io/CrystalAR/?verification=${GITHUB_SHA}"
+          for attempt in $(seq 1 24); do
+            page="$(curl -fsSL --retry 2 --max-time 20 "$url" || true)"
+            if grep -q "Versão v0.5.0" <<<"$page" \
+              && grep -q 'data-example="mof5"' <<<"$page" \
+              && grep -q 'data-example="sulfurAlpha"' <<<"$page"; then
+              echo "Published CrystalAR v0.5.0 gallery verified on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Attempt ${attempt}: waiting for the public v0.5.0 gallery."
+            sleep 10
+          done
+          echo "The public page did not expose the v0.5.0 gallery in time."
+          exit 1
