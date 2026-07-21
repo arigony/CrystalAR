@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 import { parseCIFDocument } from "./cif-parser.js";
 import { buildCrystalModel } from "./crystal.js";
 import { CrystalRenderer } from "./renderer.js";

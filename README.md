@@ -4,7 +4,7 @@
 
 ## Versão
 
-`v0.4.0` — fluxo reproduzível para dados do Crystallography Open Database: galeria local versionada, abertura da URI oficial do COD, carregamento local do CIF e registro de proveniência com SHA-256.
+`v0.4.1` — fluxo reproduzível para dados do Crystallography Open Database, carregamento mais robusto dos módulos 3D, diagnóstico visível de inicialização e teste automatizado em navegador real.
 
 ## Arquitetura de dados
 
@@ -20,9 +20,15 @@ Para uma estrutura que não esteja na galeria:
 
 Esse desenho mantém explícitos o arquivo realmente utilizado, o identificador da estrutura, a versão do aplicativo e a origem dos dados. O upload é processado localmente e não envia o CIF para outro servidor.
 
+## Robustez do navegador
+
+Os módulos do Three.js e do OrbitControls são carregados diretamente pelo jsDelivr. A interface possui um monitor de inicialização que apresenta uma mensagem clara e um botão de recarga caso o módulo 3D, o CDN ou o contexto WebGL não iniciem dentro do tempo esperado.
+
+A integração contínua abre a aplicação em um navegador Chrome real, aguarda o carregamento do exemplo inicial e falha caso a tela permaneça em **Aguardando estrutura**.
+
 ## Galeria didática local
 
-A galeria principal não depende de servidores externos. Os arquivos são processados diretamente pelo navegador.
+A galeria principal não depende de servidores de dados cristalográficos. Os arquivos CIF selecionados estão versionados no próprio repositório e são processados diretamente pelo navegador.
 
 ### Formas do carbono
 
@@ -81,9 +87,10 @@ O botão **Copiar proveniência** produz um bloco de texto que pode ser anexado 
 ```bash
 npm run check
 npm test
+npm run smoke:browser
 ```
 
-Os testes validam os CIFs da galeria, parâmetros de cela, coordenadas cartesianas, a identificação explícita do grafeno como modelo educacional e o fluxo reproduzível de abertura da URI oficial sem busca automática entre domínios.
+Os testes validam os CIFs da galeria, parâmetros de cela, coordenadas cartesianas, a identificação explícita do grafeno como modelo educacional, o fluxo reproduzível de abertura da URI oficial e a inicialização completa em navegador real.
 
 ## Limitações
 
