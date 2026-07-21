@@ -22,15 +22,37 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ruby -ryaml - <<'RUBY'
-          workflow = YAML.load_file('.github/workflows/build-v050.yml')
-          steps = workflow.fetch('jobs').fetch('build').fetch('steps')
-          scripts = steps.filter_map { |step| step['run'] }
-          abort "Expected four embedded scripts, found #{scripts.length}" unless scripts.length == 4
-          scripts.each_with_index do |script, index|
-            File.write("/tmp/v050-step-#{index}.sh", "set -euo pipefail\n#{script}\n")
-          end
-          RUBY
+          python - <<'PY'
+          from pathlib import Path
+
+          lines = Path('.github/workflows/build-v050.yml').read_text(encoding='utf-8').splitlines()
+          scripts = []
+          index = 0
+          while index < len(lines):
+              if lines[index].startswith('        run: |'):
+                  index += 1
+                  captured = []
+                  while index < len(lines):
+                      line = lines[index]
+                      if line.startswith('          '):
+                          captured.append(line[10:])
+                          index += 1
+                          continue
+                      if not line.strip():
+                          captured.append('')
+                          index += 1
+                          continue
+                      break
+                  scripts.append('\n'.join(captured).rstrip() + '\n')
+                  continue
+              index += 1
+
+          if len(scripts) != 4:
+              raise SystemExit(f'Expected four embedded scripts, found {len(scripts)}')
+
+          for number, script in enumerate(scripts):
+              Path(f'/tmp/v050-step-{number}.sh').write_text('set -euo pipefail\n' + script, encoding='utf-8')
+          PY
 
       - name: Download and verify COD CIFs
         run: bash /tmp/v050-step-0.sh
