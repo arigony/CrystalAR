@@ -1,0 +1,55 @@
+name: Apply runtime fix
+
+on:
+  push:
+    branches: [runtime-fix-v0.4.1]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[runtime-patched]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: runtime-fix-v0.4.1
+      - name: Patch browser runtime resources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+          text = text.replace('v0.4.0', 'v0.4.1')
+          text = text.replace('https://unpkg.com/three@0.160.0/build/three.module.js', 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
+          text = text.replace('https://unpkg.com/three@0.160.0/examples/jsm/', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/')
+          if 'style-v041.css' not in text:
+              text = text.replace('<link rel="stylesheet" href="style-v040.css?v=0.4.1" />', '<link rel="stylesheet" href="style-v040.css?v=0.4.1" />\n  <link rel="stylesheet" href="style-v041.css?v=0.4.1" />')
+          if 'id="runtimeAlert"' not in text:
+              alert = '''\n  <div id="runtimeAlert" class="runtime-alert hidden" role="alert">\n    <strong>O visualizador 3D não iniciou</strong>\n    <p id="runtimeAlertText">Verificando os recursos necessários…</p>\n    <button id="retryApp" class="primary" type="button">Recarregar visualizador</button>\n  </div>\n'''
+              text = text.replace('  <div id="toastBox" class="toast-box" aria-live="polite"></div>', alert + '\n  <div id="toastBox" class="toast-box" aria-live="polite"></div>')
+          if 'src/runtime-watchdog.js' not in text:
+              text = text.replace('  <script src="src/camera-toggle.js?v=0.4.1"></script>', '  <script src="src/runtime-watchdog.js?v=0.4.1"></script>\n  <script src="src/camera-toggle.js?v=0.4.1"></script>')
+          index.write_text(text, encoding='utf-8')
+
+          app = Path('src/app.js')
+          text = app.read_text(encoding='utf-8').replace('import * as THREE from "three";', 'import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";')
+          app.write_text(text, encoding='utf-8')
+
+          renderer = Path('src/renderer.js')
+          text = renderer.read_text(encoding='utf-8')
+          text = text.replace('import * as THREE from "three";', 'import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";')
+          text = text.replace('import { OrbitControls } from "three/addons/controls/OrbitControls.js";', 'import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";')
+          renderer.write_text(text, encoding='utf-8')
+
+          Path('.github/workflows/apply-runtime-fix.yml').unlink()
+          PY
+      - name: Commit patched runtime
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: stabilize browser module loading [runtime-patched]"
+          git push origin runtime-fix-v0.4.1
