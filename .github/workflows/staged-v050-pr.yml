@@ -52,8 +52,54 @@ jobs:
       - name: Download and verify COD CIFs
         run: bash /tmp/v050-step-0.sh
 
-      - name: Update gallery and metadata
-        run: bash /tmp/v050-step-1.sh
+      - name: Update gallery, metadata and release tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash /tmp/v050-step-1.sh
+          python - <<'PY'
+          from pathlib import Path
+
+          legacy = Path('tests/reproducible-workflow.test.mjs')
+          text = legacy.read_text(encoding='utf-8')
+          text = text.replace('0\\.4\\.1', '0\\.5\\.0')
+          text = text.replace('nove estruturas locais', 'dezesseis estruturas locais')
+          text = text.replace('assert.equal(exampleButtons.length, 9);', 'assert.equal(exampleButtons.length, 16);')
+          legacy.write_text(text, encoding='utf-8')
+
+          Path('tests/gallery-v050.test.mjs').write_text('''import test from "node:test";
+          import assert from "node:assert/strict";
+          import { readFile } from "node:fs/promises";
+
+          const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
+          const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+          const provenance = await readFile(new URL("../src/provenance.js", import.meta.url), "utf8");
+
+          const keys = ["sulfurAlpha", "sulfurBeta", "sulfurGamma", "sulfurS6", "iodine", "mof5", "zif8"];
+
+          test("v0.5.0 apresenta as novas famílias didáticas", () => {
+            assert.match(index, /Versão v0\.5\.0/);
+            assert.match(index, /Enxofre molecular/);
+            assert.match(index, /Cristal molecular/);
+            assert.match(index, /Redes metal-orgânicas/);
+          });
+
+          for (const key of keys) {
+            test(`exemplo ${key} está conectado à interface e à proveniência`, () => {
+              assert.ok(index.includes(`data-example="${key}"`));
+              assert.ok(app.includes(`${key}:`));
+              assert.ok(provenance.includes(`${key}:`));
+            });
+          }
+
+          test("MOFs usam cela 1x1x1 por desempenho", () => {
+            assert.match(app, /mof5:[\s\S]*?supercell: 1/);
+            assert.match(app, /zif8:[\s\S]*?supercell: 1/);
+          });
+          ''', encoding='utf-8')
+
+          Path('v050-validation-error.log').unlink(missing_ok=True)
+          PY
 
       - name: Validate syntax, CIFs and browser startup
         shell: bash
