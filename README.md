@@ -4,80 +4,55 @@
 
 ## Versão
 
-`5.0.0` — **Polimorfismo, sólidos cristalinos e materiais porosos**.
+`5.1.0` — **Comparação científica de polimorfos, coordenação e ocupação cristalográfica**.
 
-A versão 5.0 reorganiza a galeria em cinco famílias e amplia o escopo para quinze estruturas, distinguindo de forma explícita dados cristalográficos experimentais, derivados educacionais e modelos limpos de materiais porosos.
+A versão 5.1 mantém as quinze estruturas da 5.0 e acrescenta seis derivados educacionais de determinações experimentais do COD, totalizando **21 estruturas**. Os novos roteiros não tratam linhas geométricas indistintamente como “ligações”: regras específicas separam ligações covalentes de contatos de coordenação.
 
-## Galeria didática
+## Novos roteiros comparativos
 
-### Formas do carbono
+### TiO₂: mesma fórmula, diferentes redes de octaedros
 
-- diamante — derivado do COD `9012293`;
-- grafite 2H — derivado do COD `1200017`;
-- grafeno — modelo periódico 2D educacional com vácuo artificial.
+- rutilo — COD `9015662`, grupo original P4₂/mnm;
+- anatásio — COD `9015929`, grupo original I4₁/amd;
+- brookita — COD `9004137`, grupo original Pbca.
 
-### Enxofre molecular: polimorfismo de S₈
+O roteiro orienta a comparação de sistema cristalino, cela, distorção e conectividade dos octaedros TiO₆. A visualização usa regras Ti–O explícitas e pode gerar poliedros de coordenação.
 
-- α-S₈ ortorrômbico — COD `9011362`;
-- β-S₈ monoclínico — COD `4124791`;
-- γ-S₈ monoclínico — COD `2002079`.
+### CaCO₃: coordenação, empacotamento e desordem
 
-As três estruturas possuem a mesma unidade molecular S₈, mas diferem no empacotamento cristalino. Isso permite separar **polimorfismo** de mudança de composição molecular.
+- calcita — COD `9000095`, grupo original R-3c;
+- aragonita — COD `9000229`, grupo original Pmcn;
+- vaterita — COD `9007475`, modelo médio histórico P6₃/mmc de Kamhi.
 
-### Sólidos iônicos
+O aplicativo distingue ligações covalentes C–O de contatos Ca–O. Na vaterita, as posições de ocupação `1/3` são mostradas com transparência e acompanhadas de alerta: orientações alternativas parcialmente ocupadas não devem ser interpretadas como presentes simultaneamente.
 
-- NaCl — COD `1000041`;
-- CsCl — COD `9008789`;
-- MgO — COD `1011173`;
-- CaF₂ — COD `1000043`.
+## Integridade cristalográfica
 
-### Redes metal-orgânicas
+Os seis novos arquivos são derivados educacionais **expandidos em P1** a partir das coordenadas e operações de simetria das entradas COD citadas. Essa decisão:
 
-- MOF-5/IRMOF-1 — modelo limpo identificado por `EDUSIF`;
-- HKUST-1/Cu-BTC — modelo limpo identificado por `FIQCEN`;
-- ZIF-8 — modelo limpo identificado por `OFERUN`.
+- preserva o COD ID, os autores e os parâmetros da cela;
+- registra o grupo espacial original no arquivo e na interface;
+- evita depender da interpretação de configurações avançadas pelo parser;
+- torna explícito que o arquivo local é um derivado, não o CIF experimental intacto.
 
-Os modelos de MOFs são derivados educacionais sem solventes, com ocupação integral e simetria P1 explícita. Não são apresentados como CIFs experimentais intactos. A visualização inicial usa wireframe e cela `1 × 1 × 1` para reduzir o custo gráfico em celulares.
+## Funcionalidades científicas e pedagógicas
 
-### Polimorfos do ZnS
-
-- blenda de zinco — COD `9000107`;
-- wurtzita 2H — COD `1100044`.
-
-## Metadados didáticos dos MOFs
-
-Cada cartão informa o nó metálico, o ligante, a topologia e a característica estrutural principal:
-
-| Estrutura | Nó | Ligante | Topologia | Destaque |
-| --- | --- | --- | --- | --- |
-| MOF-5 | Zn₄O | tereftalato (BDC) | pcu | grandes cavidades cúbicas |
-| HKUST-1 | Cu₂ paddlewheel | BTC | tbo | sítios metálicos abertos após ativação |
-| ZIF-8 | Zn tetraédrico | 2-metilimidazolato | sod | cavidades conectadas por janelas estreitas |
-
-## Proveniência e reprodutibilidade
-
-Para cada estrutura, o CrystalAR apresenta, quando disponível:
-
-- classificação do arquivo;
-- COD ID ou identificador estrutural do modelo;
-- URI da fonte;
-- versão do aplicativo;
-- data de incorporação;
-- SHA-256 do texto CIF processado;
-- referência cristalográfica contida no arquivo.
-
-Arquivos experimentais adicionais continuam sendo obtidos pelo fluxo em duas etapas: abrir a URI oficial do COD, salvar o CIF e carregá-lo localmente. O arquivo não é enviado para outro servidor.
-
-## Funcionalidades
-
-- galeria local categorizada e responsiva;
+- 21 estruturas em sete famílias;
+- roteiro guiado para alternar entre três polimorfos relacionados;
+- regras de distância específicas para Ti–O, C–O e Ca–O;
+- distinção visual entre ligação covalente e coordenação;
+- poliedros TiO₆ e CaOₙ opcionais;
+- medição interativa de distâncias e ângulos por seleção de átomos;
+- representação semitransparente de ocupações parciais;
+- perguntas orientadoras e alertas de interpretação;
 - ball-and-stick, space-filling e wireframe;
 - cela unitária e supercelas `1 × 1 × 1`, `2 × 2 × 2` e `3 × 3 × 3`;
-- upload de `.cif` e `.mcif` processado no navegador;
-- cálculo de SHA-256;
-- painel de metadados, referência, nota didática e proveniência;
-- WebAR com câmera, rastreamento de mão e fallback por toque, mouse e roda;
-- teste automatizado de inicialização em navegador real.
+- upload local de `.cif` e `.mcif`, SHA-256 e proveniência;
+- WebAR com rastreamento de mão e fallback por toque.
+
+## Galeria preservada da versão 5.0
+
+Carbono: diamante, grafite e grafeno. Enxofre: α-S₈, β-S₈ e γ-S₈. Sólidos iônicos: NaCl, CsCl, MgO e CaF₂. MOFs: MOF-5, HKUST-1 e ZIF-8. ZnS: blenda e wurtzita.
 
 ## Testes
 
@@ -87,23 +62,19 @@ npm test
 npm run smoke:browser
 ```
 
-Os testes verificam os quinze CIFs, parâmetros de cela, coordenadas cartesianas, conexão entre cartões e arquivos, proveniência, escopo da versão e inicialização completa no Chrome.
-
-## Escopo adiado
-
-S₆ e UiO-66 não fazem parte do lançamento 5.0.0. S₆ depende de validação adicional da seleção estrutural; UiO-66 exige tratamento explícito de desordem, ocupações fracionárias e hóspedes. Modos de superfície de poros e separação automática entre nó, ligante e hóspedes ficam para uma versão posterior.
+Os testes da versão 5.1 verificam sintaxe, seis novos CIFs, COD IDs, fórmulas, grupos originais, número de átomos após expansão, ocupação parcial da vaterita, regras químicas e integração da interface.
 
 ## Limitações
 
-- o parser cobre CIF 1.1 comum, não todos os casos avançados;
-- ligações são inferidas geometricamente;
-- o parser registra ocupações e grupos de desordem, mas não resolve automaticamente configurações desordenadas;
-- os modelos limpos de MOFs representam a rede para fins didáticos e não preservam solventes ou desordem da determinação original;
+- a inferência genérica permanece para estruturas antigas, enquanto os novos roteiros usam regras explícitas;
+- poliedros próximos às fronteiras podem exigir supercela `2 × 2 × 2` para completar a coordenação;
+- a vaterita COD `9007475` é um modelo médio histórico, não uma solução estrutural ordenada definitiva;
+- o parser registra desordem e ocupação, mas não escolhe automaticamente uma configuração ordenada;
 - supercelas grandes podem reduzir o desempenho em celulares.
 
 ## Fonte e licença
 
-Código: MIT. Estruturas derivadas do COD mantêm identificadores e referências. Os modelos de MOFs são derivados da coleção pública usada no `mlip-arena`, com os identificadores estruturais preservados.
+Código: MIT. Dados COD: CC0, com reconhecimento dos autores originais. Modelos de MOFs: derivados educacionais da coleção pública identificada no painel de proveniência.
 
 ## Autor
 
