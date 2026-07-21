@@ -1,0 +1,525 @@
+name: Build CrystalAR 5.0.0
+
+on:
+  push:
+    branches: [v0.5.0-expanded-gallery]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v0.5.0-expanded-gallery
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Replace MOFs with clean educational models
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://raw.githubusercontent.com/atomind-ai/mlip-arena/6239aea513c494aeab237fc96ef133b9b1cc204f/benchmarks/mof/structures"
+          curl -fsSL --retry 4 --retry-delay 2 "$base/MOF-5.cif" -o examples/mof5-clean.cif
+          curl -fsSL --retry 4 --retry-delay 2 "$base/HKUST-1.cif" -o examples/hkust1-clean.cif
+          curl -fsSL --retry 4 --retry-delay 2 "$base/ZIF-8.cif" -o examples/zif8-clean.cif
+          for file in examples/mof5-clean.cif examples/hkust1-clean.cif examples/zif8-clean.cif; do
+            grep -q "_atom_site_fract_x" "$file"
+            grep -q "_atom_site_occupancy" "$file"
+          done
+
+      - name: Implement CrystalAR 5.0.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          VERSION = "5.0.0"
+          SOURCE_BASE = "https://github.com/atomind-ai/mlip-arena/blob/6239aea513c494aeab237fc96ef133b9b1cc204f/benchmarks/mof/structures"
+
+          def sub_once(text, pattern, replacement, label, flags=0):
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"Expected one replacement in {label}, found {count}: {pattern[:100]}")
+              return updated
+
+          def enrich_cif(path, name, formula, csd_code, source_name):
+              text = Path(path).read_text(encoding="utf-8")
+              lines = text.splitlines()
+              if not lines or not lines[0].lower().startswith("data_"):
+                  raise SystemExit(f"Invalid CIF data block: {path}")
+              metadata = [
+                  f"_chemical_name_common            '{name}'",
+                  f"_chemical_formula_sum            '{formula}'",
+                  f"_database_code_csd               {csd_code}",
+                  "_publ_section_title",
+                  ";",
+                  f"CrystalAR cleaned educational model of {name}.",
+                  f"Source structure identifier: {csd_code}; collection: {source_name}.",
+                  "Solvent-free, full-occupancy P1 model used for stable browser visualization.",
+                  ";",
+              ]
+              header = [
+                  "# CrystalAR 5.0.0 educational model",
+                  f"# Source: {SOURCE_BASE}/{Path(path).name.replace('-clean', '').replace('hkust1', 'HKUST-1').replace('mof5', 'MOF-5').replace('zif8', 'ZIF-8')}",
+                  "# This is a cleaned derivative, not an intact experimental CIF.",
+              ]
+              Path(path).write_text("\n".join([lines[0], *header, *metadata, *lines[1:]]) + "\n", encoding="utf-8")
+
+          enrich_cif("examples/mof5-clean.cif", "MOF-5 / IRMOF-1", "Zn4 O (C8 H4 O4)3", "EDUSIF", "CoRE MOF-derived public model")
+          enrich_cif("examples/hkust1-clean.cif", "HKUST-1 / Cu-BTC", "Cu3 (C9 H3 O6)2", "FIQCEN", "CoRE MOF-derived public model")
+          enrich_cif("examples/zif8-clean.cif", "ZIF-8", "Zn (C4 H5 N2)2", "OFERUN", "CoRE MOF-derived public model")
+
+          # Remove structures explicitly deferred beyond 5.0.0 and superseded MOF files.
+          for obsolete in [
+              "examples/sulfur-s6-9012361.cif",
+              "examples/iodine-9008595.cif",
+              "examples/mof5-1516287.cif",
+              "examples/zif8-7111973.cif",
+              "tests/gallery-v050.test.mjs",
+              "RELEASE_NOTES_v0.5.0.md",
+              "v050-validation-error.log",
+          ]:
+              Path(obsolete).unlink(missing_ok=True)
+
+          # package.json
+          package_path = Path("package.json")
+          package = json.loads(package_path.read_text(encoding="utf-8"))
+          package["version"] = VERSION
+          package_path.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          # index.html
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8").replace("0.5.0", VERSION)
+          text = text.replace('<span class="eyebrow">Versão v5.0.0</span>', '<span class="eyebrow">Versão 5.0</span>')
+          text = text.replace(
+              "Exemplos locais, estáveis e versionados. A galeria compara redes covalentes, cristais moleculares, polimorfismo, sólidos iônicos e materiais porosos. O grafeno permanece identificado como modelo 2D.",
+              "Quinze estruturas locais para comparar redes covalentes, polimorfismo, sólidos iônicos e materiais porosos. Dados experimentais e modelos educacionais derivados são identificados separadamente."
+          )
+          text = sub_once(
+              text,
+              r'\n\s*<button class="example-card" type="button" data-example="sulfurS6".*?</button>',
+              "",
+              "index sulfur S6",
+              re.S,
+          )
+          text = sub_once(
+              text,
+              r'\n\s*<section class="example-group" aria-labelledby="molecularTitle">.*?</section>\n',
+              "\n",
+              "index molecular section",
+              re.S,
+          )
+          porous = '''<section class="example-group" aria-labelledby="porousTitle">
+        <div class="example-group-heading">
+          <h3 id="porousTitle">Redes metal-orgânicas</h3>
+          <span>nós metálicos, ligantes, topologia e cavidades</span>
+        </div>
+        <div class="example-grid">
+          <button class="example-card" type="button" data-example="mof5" aria-pressed="false">
+            <strong>MOF-5</strong><span class="badge model">Zn₄O–BDC · modelo limpo</span>
+          </button>
+          <button class="example-card" type="button" data-example="hkust1" aria-pressed="false">
+            <strong>HKUST-1</strong><span class="badge model">Cu–BTC · modelo limpo</span>
+          </button>
+          <button class="example-card" type="button" data-example="zif8" aria-pressed="false">
+            <strong>ZIF-8</strong><span class="badge model">Zn–mIm · modelo limpo</span>
+          </button>
+        </div>
+      </section>'''
+          text = sub_once(
+              text,
+              r'<section class="example-group" aria-labelledby="porousTitle">.*?</section>',
+              porous,
+              "index MOF section",
+              re.S,
+          )
+          text = text.replace('<div class="wide"><span>URI oficial</span>', '<div class="wide"><span>URI da fonte</span>')
+          text = text.replace('<button id="openOfficialCif" class="secondary" type="button" disabled>Abrir CIF oficial</button>', '<button id="openOfficialCif" class="secondary" type="button" disabled>Abrir fonte estrutural</button>')
+          text = sub_once(
+              text,
+              r'<small class="source-note">.*?</small>',
+              '<small class="source-note">Estruturas de enxofre e demais sólidos experimentais: derivados de entradas COD, com identificadores e referências preservados. MOF-5, HKUST-1 e ZIF-8: modelos educacionais limpos, sem solventes e com ocupação integral, derivados de estruturas públicas identificadas por EDUSIF, FIQCEN e OFERUN. Grafeno: modelo 2D explicitamente identificado.</small>',
+              "index source note",
+              re.S,
+          )
+          path.write_text(text, encoding="utf-8")
+
+          # src/app.js
+          path = Path("src/app.js")
+          text = path.read_text(encoding="utf-8")
+          text = sub_once(text, r'\n  sulfurS6: \{.*?\n  \},', "", "app sulfur S6", re.S)
+          text = sub_once(text, r'\n  iodine: \{.*?\n  \},', "", "app iodine", re.S)
+          mof_entries = '''  mof5: {
+    label: "MOF-5 — IRMOF-1",
+    path: "examples/mof5-clean.cif",
+    codId: "",
+    provenance: "Modelo educacional limpo derivado da estrutura pública EDUSIF",
+    teachingNote: "Nó metálico: Zn₄O. Ligante: tereftalato (BDC). Topologia: pcu. Conectividade do nó: 6. A cela primitiva evidencia grandes cavidades cúbicas.",
+    sourceLabel: "galeria local · modelo educacional EDUSIF",
+    representation: "wire", showBonds: true, supercell: 1
+  },
+  hkust1: {
+    label: "HKUST-1 — Cu-BTC",
+    path: "examples/hkust1-clean.cif",
+    codId: "",
+    provenance: "Modelo educacional limpo derivado da estrutura pública FIQCEN",
+    teachingNote: "Nó metálico: unidade dimérica Cu–Cu do tipo paddlewheel. Ligante: benzeno-1,3,5-tricarboxilato (BTC). Topologia: tbo. Após ativação, pode apresentar sítios metálicos abertos.",
+    sourceLabel: "galeria local · modelo educacional FIQCEN",
+    representation: "wire", showBonds: true, supercell: 1
+  },
+  zif8: {
+    label: "ZIF-8",
+    path: "examples/zif8-clean.cif",
+    codId: "",
+    provenance: "Modelo educacional limpo derivado da estrutura pública OFERUN",
+    teachingNote: "Nó: Zn tetraédrico. Ligante: 2-metilimidazolato. Topologia: sod, semelhante à sodalita. As cavidades são conectadas por janelas estreitas.",
+    sourceLabel: "galeria local · modelo educacional OFERUN",
+    representation: "wire", showBonds: true, supercell: 1
+  },'''
+          text = sub_once(
+              text,
+              r'  mof5: \{.*?\n  \},\n  zif8: \{.*?\n  \},',
+              mof_entries,
+              "app MOF entries",
+              re.S,
+          )
+          text = text.replace(
+              'source: example.codId ? `galeria local · COD ${example.codId}` : "galeria local · modelo 2D",',
+              'source: example.sourceLabel || (example.codId ? `galeria local · COD ${example.codId}` : "galeria local · modelo educacional"),'
+          )
+          path.write_text(text, encoding="utf-8")
+
+          # src/provenance.js
+          path = Path("src/provenance.js")
+          text = path.read_text(encoding="utf-8").replace('const APP_VERSION = "v0.5.0";', 'const APP_VERSION = "v5.0.0";')
+          text = re.sub(r'^\s*sulfurS6:.*\n', '', text, flags=re.M)
+          text = re.sub(r'^\s*iodine:.*\n', '', text, flags=re.M)
+          old_mofs = '''    mof5: { label: "MOF-5 — IRMOF-1", path: "examples/mof5-1516287.cif", codId: "1516287", type: "Determinação experimental COD" },
+    zif8: { label: "ZIF-8", path: "examples/zif8-7111973.cif", codId: "7111973", type: "Determinação experimental COD" },'''
+          new_mofs = f'''    mof5: {{ label: "MOF-5 — IRMOF-1", path: "examples/mof5-clean.cif", codId: "", type: "Modelo educacional limpo — EDUSIF", uri: "{SOURCE_BASE}/MOF-5.cif" }},
+    hkust1: {{ label: "HKUST-1 — Cu-BTC", path: "examples/hkust1-clean.cif", codId: "", type: "Modelo educacional limpo — FIQCEN", uri: "{SOURCE_BASE}/HKUST-1.cif" }},
+    zif8: {{ label: "ZIF-8", path: "examples/zif8-clean.cif", codId: "", type: "Modelo educacional limpo — OFERUN", uri: "{SOURCE_BASE}/ZIF-8.cif" }},'''
+          if old_mofs not in text:
+              raise SystemExit("MOF provenance block not found")
+          text = text.replace(old_mofs, new_mofs)
+          text = text.replace('uri: officialUri(example.codId),', 'uri: example.uri || officialUri(example.codId),')
+          path.write_text(text, encoding="utf-8")
+
+          # CITATION.cff
+          path = Path("CITATION.cff")
+          text = path.read_text(encoding="utf-8")
+          text = re.sub(r'^version:.*$', 'version: "5.0.0"', text, flags=re.M)
+          text = re.sub(r'^date-released:.*$', 'date-released: "2026-07-21"', text, flags=re.M)
+          path.write_text(text, encoding="utf-8")
+
+          # README.md
+          Path("README.md").write_text('''# CrystalAR
+
+**CrystalAR** é um visualizador educacional aberto de estruturas cristalográficas em 3D e realidade aumentada diretamente no navegador.
+
+## Versão
+
+`5.0.0` — **Polimorfismo, sólidos cristalinos e materiais porosos**.
+
+A versão 5.0 reorganiza a galeria em cinco famílias e amplia o escopo para quinze estruturas, distinguindo de forma explícita dados cristalográficos experimentais, derivados educacionais e modelos limpos de materiais porosos.
+
+## Galeria didática
+
+### Formas do carbono
+
+- diamante — derivado do COD `9012293`;
+- grafite 2H — derivado do COD `1200017`;
+- grafeno — modelo periódico 2D educacional com vácuo artificial.
+
+### Enxofre molecular: polimorfismo de S₈
+
+- α-S₈ ortorrômbico — COD `9011362`;
+- β-S₈ monoclínico — COD `4124791`;
+- γ-S₈ monoclínico — COD `2002079`.
+
+As três estruturas possuem a mesma unidade molecular S₈, mas diferem no empacotamento cristalino. Isso permite separar **polimorfismo** de mudança de composição molecular.
+
+### Sólidos iônicos
+
+- NaCl — COD `1000041`;
+- CsCl — COD `9008789`;
+- MgO — COD `1011173`;
+- CaF₂ — COD `1000043`.
+
+### Redes metal-orgânicas
+
+- MOF-5/IRMOF-1 — modelo limpo identificado por `EDUSIF`;
+- HKUST-1/Cu-BTC — modelo limpo identificado por `FIQCEN`;
+- ZIF-8 — modelo limpo identificado por `OFERUN`.
+
+Os modelos de MOFs são derivados educacionais sem solventes, com ocupação integral e simetria P1 explícita. Não são apresentados como CIFs experimentais intactos. A visualização inicial usa wireframe e cela `1 × 1 × 1` para reduzir o custo gráfico em celulares.
+
+### Polimorfos do ZnS
+
+- blenda de zinco — COD `9000107`;
+- wurtzita 2H — COD `1100044`.
+
+## Metadados didáticos dos MOFs
+
+Cada cartão informa o nó metálico, o ligante, a topologia e a característica estrutural principal:
+
+| Estrutura | Nó | Ligante | Topologia | Destaque |
+| --- | --- | --- | --- | --- |
+| MOF-5 | Zn₄O | tereftalato (BDC) | pcu | grandes cavidades cúbicas |
+| HKUST-1 | Cu₂ paddlewheel | BTC | tbo | sítios metálicos abertos após ativação |
+| ZIF-8 | Zn tetraédrico | 2-metilimidazolato | sod | cavidades conectadas por janelas estreitas |
+
+## Proveniência e reprodutibilidade
+
+Para cada estrutura, o CrystalAR apresenta, quando disponível:
+
+- classificação do arquivo;
+- COD ID ou identificador estrutural do modelo;
+- URI da fonte;
+- versão do aplicativo;
+- data de incorporação;
+- SHA-256 do texto CIF processado;
+- referência cristalográfica contida no arquivo.
+
+Arquivos experimentais adicionais continuam sendo obtidos pelo fluxo em duas etapas: abrir a URI oficial do COD, salvar o CIF e carregá-lo localmente. O arquivo não é enviado para outro servidor.
+
+## Funcionalidades
+
+- galeria local categorizada e responsiva;
+- ball-and-stick, space-filling e wireframe;
+- cela unitária e supercelas `1 × 1 × 1`, `2 × 2 × 2` e `3 × 3 × 3`;
+- upload de `.cif` e `.mcif` processado no navegador;
+- cálculo de SHA-256;
+- painel de metadados, referência, nota didática e proveniência;
+- WebAR com câmera, rastreamento de mão e fallback por toque, mouse e roda;
+- teste automatizado de inicialização em navegador real.
+
+## Testes
+
+```bash
+npm run check
+npm test
+npm run smoke:browser
+```
+
+Os testes verificam os quinze CIFs, parâmetros de cela, coordenadas cartesianas, conexão entre cartões e arquivos, proveniência, escopo da versão e inicialização completa no Chrome.
+
+## Escopo adiado
+
+S₆ e UiO-66 não fazem parte do lançamento 5.0.0. S₆ depende de validação adicional da seleção estrutural; UiO-66 exige tratamento explícito de desordem, ocupações fracionárias e hóspedes. Modos de superfície de poros e separação automática entre nó, ligante e hóspedes ficam para uma versão posterior.
+
+## Limitações
+
+- o parser cobre CIF 1.1 comum, não todos os casos avançados;
+- ligações são inferidas geometricamente;
+- o parser registra ocupações e grupos de desordem, mas não resolve automaticamente configurações desordenadas;
+- os modelos limpos de MOFs representam a rede para fins didáticos e não preservam solventes ou desordem da determinação original;
+- supercelas grandes podem reduzir o desempenho em celulares.
+
+## Fonte e licença
+
+Código: MIT. Estruturas derivadas do COD mantêm identificadores e referências. Os modelos de MOFs são derivados da coleção pública usada no `mlip-arena`, com os identificadores estruturais preservados.
+
+## Autor
+
+Prof. Dr. André Arigony Souto  
+PUCRS — Pontifícia Universidade Católica do Rio Grande do Sul  
+ORCID: 0000-0002-2437-8767
+''', encoding="utf-8")
+
+          # Gallery test: exactly 15 structures.
+          Path("tests/gallery.test.mjs").write_text('''import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { parseCIFDocument } from "../src/cif-parser.js";
+import { buildCrystalModel } from "../src/crystal.js";
+
+const examples = [
+  ["diamond-9012293.cif", "9012293", 8],
+  ["graphite-1200017.cif", "1200017", 4],
+  ["graphene-model.cif", "graphene_model", 32],
+  ["sulfur-alpha-9011362.cif", "9011362", null],
+  ["sulfur-beta-4124791.cif", "4124791", null],
+  ["sulfur-gamma-2002079.cif", "2002079", null],
+  ["mof5-clean.cif", "EDUSIF_clean", null],
+  ["hkust1-clean.cif", "FIQCEN_clean", null],
+  ["zif8-clean.cif", "OFERUN_clean", null],
+  ["nacl-1000041.cif", "1000041", 8],
+  ["cscl-9008789.cif", "9008789", 2],
+  ["mgo-1011173.cif", "1011173", 8],
+  ["caf2-1000043.cif", "1000043", 12],
+  ["zns-sphalerite-9000107.cif", "9000107", 8],
+  ["zns-wurtzite-1100044.cif", "1100044", 4]
+];
+
+for (const [filename, expectedId, expectedAtoms] of examples) {
+  test(`galeria: ${filename} é um CIF válido e renderizável`, async () => {
+    const text = await readFile(new URL(`../examples/${filename}`, import.meta.url), "utf8");
+    const doc = parseCIFDocument(text);
+    const model = buildCrystalModel(doc, 1);
+    assert.equal(model.metadata.codId, expectedId);
+    if (expectedAtoms == null) assert.ok(model.unitAtoms.length > 0);
+    else assert.equal(model.unitAtoms.length, expectedAtoms);
+    assert.ok(model.cell.a > 0 && model.cell.b > 0 && model.cell.c > 0);
+    assert.ok(model.atoms.every(atom => atom.cart.every(Number.isFinite)));
+  });
+}
+
+test("grafeno é explicitamente identificado como modelo educacional", async () => {
+  const text = await readFile(new URL("../examples/graphene-model.cif", import.meta.url), "utf8");
+  assert.match(text, /educational 2D model/i);
+  assert.match(text, /artificial vacuum spacing/i);
+  assert.match(text, /4 x 4 in-plane patch/i);
+  assert.doesNotMatch(text, /_cod_database_code\s+\d/i);
+});
+
+test("MOFs são marcados como modelos educacionais limpos", async () => {
+  for (const filename of ["mof5-clean.cif", "hkust1-clean.cif", "zif8-clean.cif"]) {
+    const text = await readFile(new URL(`../examples/${filename}`, import.meta.url), "utf8");
+    assert.match(text, /cleaned educational model/i);
+    assert.doesNotMatch(text, /_cod_database_code\s+\d/i);
+  }
+});
+''', encoding="utf-8")
+
+          Path("tests/reproducible-workflow.test.mjs").write_text('''import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
+const workflow = await readFile(new URL("../src/provenance.js", import.meta.url), "utf8");
+const watchdog = await readFile(new URL("../src/runtime-watchdog.js", import.meta.url), "utf8");
+const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+const renderer = await readFile(new URL("../src/renderer.js", import.meta.url), "utf8");
+
+test("a interface apresenta CrystalAR 5.0 e o fluxo em duas etapas", () => {
+  assert.match(index, /Versão 5\.0/);
+  assert.match(index, /Abrir a URI oficial/);
+  assert.match(index, /Abrir o CIF baixado/);
+  assert.match(index, /O CrystalAR não baixa dados do COD automaticamente/);
+});
+
+test("o formulário abre a URI oficial sem iniciar busca remota", () => {
+  assert.match(workflow, /https:\/\/www\.crystallography\.net\/cod\//);
+  assert.match(workflow, /stopImmediatePropagation\(\)/);
+  assert.match(workflow, /window\.open\(uri/);
+  assert.doesNotMatch(workflow, /fetch\(officialUri/);
+});
+
+test("a proveniência inclui versão, identificador, URI e SHA-256", () => {
+  assert.match(index, /SHA-256 do texto CIF carregado/);
+  assert.match(index, /Copiar proveniência/);
+  assert.match(workflow, /crypto\.subtle\.digest\("SHA-256"/);
+  assert.match(workflow, /APP_VERSION = "v5\.0\.0"/);
+  assert.match(workflow, /EDUSIF/);
+  assert.match(workflow, /FIQCEN/);
+  assert.match(workflow, /OFERUN/);
+});
+
+test("o carregamento 3D usa jsDelivr e possui recuperação visível", () => {
+  assert.match(index, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
+  assert.match(app, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
+  assert.match(renderer, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
+  assert.match(index, /runtime-watchdog\.js\?v=5\.0\.0/);
+  assert.match(watchdog, /A estrutura inicial não foi carregada/);
+  assert.match(index, /Recarregar visualizador/);
+});
+
+test("a galeria mantém quinze estruturas locais", () => {
+  const exampleButtons = index.match(/data-example=/g) || [];
+  assert.equal(exampleButtons.length, 15);
+});
+''', encoding="utf-8")
+
+          Path("tests/gallery-v500.test.mjs").write_text('''import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
+const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+const provenance = await readFile(new URL("../src/provenance.js", import.meta.url), "utf8");
+const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+
+const keys = ["sulfurAlpha", "sulfurBeta", "sulfurGamma", "mof5", "hkust1", "zif8"];
+
+test("CrystalAR 5.0.0 apresenta polimorfismo e materiais porosos", () => {
+  assert.equal(packageJson.version, "5.0.0");
+  assert.match(index, /Enxofre molecular/);
+  assert.match(index, /Redes metal-orgânicas/);
+  assert.match(index, /HKUST-1/);
+});
+
+for (const key of keys) {
+  test(`exemplo ${key} está conectado à interface e à proveniência`, () => {
+    assert.match(index, new RegExp(`data-example=["']${key}["']`));
+    assert.match(app, new RegExp(`\\b${key}:`));
+    assert.match(provenance, new RegExp(`\\b${key}:`));
+  });
+}
+
+test("MOFs usam wireframe e cela 1 × 1 × 1", () => {
+  for (const key of ["mof5", "hkust1", "zif8"]) {
+    assert.match(app, new RegExp(`${key}:[\\s\\S]*?representation: ["']wire["'][\\s\\S]*?supercell: 1`));
+  }
+});
+
+test("S6 e UiO-66 permanecem fora do escopo 5.0.0", () => {
+  assert.doesNotMatch(index, /data-example=["']sulfurS6["']/);
+  assert.doesNotMatch(index, /UiO-66/i);
+  assert.doesNotMatch(app, /sulfurS6:/);
+  assert.doesNotMatch(app, /uio66:/i);
+});
+''', encoding="utf-8")
+
+          Path("RELEASE_NOTES_5.0.0.md").write_text('''# CrystalAR 5.0.0
+
+## Polimorfismo, sólidos cristalinos e materiais porosos
+
+A versão 5.0.0 amplia a galeria de 9 para 15 estruturas e introduz duas novas famílias didáticas.
+
+### Novas estruturas
+
+- α-S₈, β-S₈ e γ-S₈ para comparar polimorfos cristalinos da mesma molécula;
+- MOF-5, HKUST-1 e ZIF-8 como modelos educacionais limpos de redes metal-orgânicas.
+
+### Rigor de proveniência
+
+- enxofres derivados de determinações experimentais do COD;
+- MOFs identificados como modelos limpos, sem solventes e com ocupação integral;
+- identificadores EDUSIF, FIQCEN e OFERUN e URI da fonte preservados;
+- SHA-256 calculado no navegador.
+
+### Decisões de escopo
+
+S₆ e UiO-66 foram adiados. A UiO-66 exige tratamento explícito de desordem e ocupações fracionárias. Superfícies de poros e separação automática de nós, ligantes e hóspedes ficam para uma versão posterior.
+''', encoding="utf-8")
+          PY
+
+      - name: Validate CrystalAR 5.0.0
+        run: |
+          npm run check
+          npm test
+          npm run smoke:browser
+
+      - name: Commit validated release
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/build-v500.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Release CrystalAR 5.0.0 educational gallery"
+          git push origin HEAD:v0.5.0-expanded-gallery
