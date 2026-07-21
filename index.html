@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="CrystalAR — galeria educacional de estruturas cristalográficas em 3D e realidade aumentada, com CIFs locais, proveniência e fluxo reproduzível para dados do COD." />
   <title>CrystalAR — Galeria cristalográfica 3D e AR</title>
-  <link rel="stylesheet" href="style.css?v=0.4.1" />
-  <link rel="stylesheet" href="style-v040.css?v=0.4.1" />
-  <link rel="stylesheet" href="style-v041.css?v=0.4.1" />
+  <link rel="stylesheet" href="style.css?v=0.5.0" />
+  <link rel="stylesheet" href="style-v040.css?v=0.5.0" />
+  <link rel="stylesheet" href="style-v041.css?v=0.5.0" />
   <script type="importmap">
   {
     "imports": {
@@ -40,7 +40,7 @@
   <aside class="control-panel" aria-label="Controles do CrystalAR">
     <div class="panel-heading">
       <div>
-        <span class="eyebrow">Versão v0.4.1</span>
+        <span class="eyebrow">Versão v0.5.0</span>
         <h2>Galeria cristalográfica</h2>
       </div>
       <button id="collapseControls" class="icon-button" type="button" aria-label="Recolher controles">−</button>
@@ -48,7 +48,7 @@
 
     <div id="controlBody" class="control-body">
       <p class="gallery-intro">
-        Exemplos locais, estáveis e versionados. O selo <strong>Experimental COD</strong> identifica modelos derivados de determinações experimentais; o grafeno é identificado separadamente como modelo 2D.
+        Exemplos locais, estáveis e versionados. A galeria compara redes covalentes, cristais moleculares, polimorfismo, sólidos iônicos e materiais porosos. O grafeno permanece identificado como modelo 2D.
       </p>
 
       <section class="example-group" aria-labelledby="carbonTitle">
@@ -66,6 +66,55 @@
           <button class="example-card" type="button" data-example="graphene" aria-pressed="false">
             <strong>Grafeno</strong><span class="badge model">Modelo 2D</span>
           </button>
+        </div>
+      </section>
+
+
+      <section class="example-group" aria-labelledby="sulfurTitle">
+        <div class="example-group-heading">
+<h3 id="sulfurTitle">Enxofre molecular</h3>
+<span>alotropia molecular e polimorfismo cristalino</span>
+        </div>
+        <div class="example-grid">
+<button class="example-card" type="button" data-example="sulfurAlpha" aria-pressed="false">
+  <strong>α-S₈</strong><span class="badge experimental">Ortorrômbico · COD</span>
+</button>
+<button class="example-card" type="button" data-example="sulfurBeta" aria-pressed="false">
+  <strong>β-S₈</strong><span class="badge experimental">Monoclínico · COD</span>
+</button>
+<button class="example-card" type="button" data-example="sulfurGamma" aria-pressed="false">
+  <strong>γ-S₈</strong><span class="badge experimental">Monoclínico · COD</span>
+</button>
+<button class="example-card" type="button" data-example="sulfurS6" aria-pressed="false">
+  <strong>Ciclo-S₆</strong><span class="badge experimental">Molécula S₆ · COD</span>
+</button>
+        </div>
+      </section>
+
+      <section class="example-group" aria-labelledby="molecularTitle">
+        <div class="example-group-heading">
+<h3 id="molecularTitle">Cristal molecular</h3>
+<span>moléculas discretas e forças intermoleculares</span>
+        </div>
+        <div class="example-grid">
+<button class="example-card" type="button" data-example="iodine" aria-pressed="false">
+  <strong>Iodo sólido, I₂</strong><span class="badge experimental">Molecular · COD</span>
+</button>
+        </div>
+      </section>
+
+      <section class="example-group" aria-labelledby="porousTitle">
+        <div class="example-group-heading">
+<h3 id="porousTitle">Redes metal-orgânicas</h3>
+<span>nós, ligantes, topologia e poros</span>
+        </div>
+        <div class="example-grid">
+<button class="example-card" type="button" data-example="mof5" aria-pressed="false">
+  <strong>MOF-5</strong><span class="badge experimental">Zn₄O–BDC · COD</span>
+</button>
+<button class="example-card" type="button" data-example="zif8" aria-pressed="false">
+  <strong>ZIF-8</strong><span class="badge experimental">Zn–imidazolato · COD</span>
+</button>
         </div>
       </section>
 
@@ -203,7 +252,7 @@
           <div><span>COD ID</span><strong id="provCodId">—</strong></div>
           <div class="wide"><span>URI oficial</span><strong id="provUri">—</strong></div>
           <div><span>Incorporação</span><strong id="provDate">—</strong></div>
-          <div><span>CrystalAR</span><strong id="provVersion">v0.4.1</strong></div>
+          <div><span>CrystalAR</span><strong id="provVersion">v0.5.0</strong></div>
           <div class="hash-item wide"><span>SHA-256 do texto CIF carregado</span><strong id="provHash">calculando…</strong></div>
         </div>
         <div class="provenance-actions">
@@ -212,7 +261,7 @@
         </div>
       </section>
 
-      <small class="source-note">Arquivos experimentais da galeria: derivados de entradas COD CC0, com COD ID e referência preservados. O navegador não consulta o COD automaticamente. Grafeno: modelo 2D explicitamente identificado.</small>
+      <small class="source-note">Arquivos experimentais da galeria: cópias locais de entradas COD CC0, com COD ID e referência preservados. MOF-5 e ZIF-8 são células experimentais e podem ser mais pesados em celulares. O navegador não consulta o COD automaticamente. Grafeno: modelo 2D explicitamente identificado.</small>
     </div>
   </section>
 
@@ -232,9 +281,9 @@
 
   <div id="toastBox" class="toast-box" aria-live="polite"></div>
 
-  <script src="src/runtime-watchdog.js?v=0.4.1"></script>
-  <script src="src/camera-toggle.js?v=0.4.1"></script>
-  <script src="src/provenance.js?v=0.4.1"></script>
-  <script type="module" src="src/app.js?v=0.4.1"></script>
+  <script src="src/runtime-watchdog.js?v=0.5.0"></script>
+  <script src="src/camera-toggle.js?v=0.5.0"></script>
+  <script src="src/provenance.js?v=0.5.0"></script>
+  <script type="module" src="src/app.js?v=0.5.0"></script>
 </body>
 </html>

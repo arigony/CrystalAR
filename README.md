@@ -4,107 +4,88 @@
 
 ## Versão
 
-`v0.4.1` — fluxo reproduzível para dados do Crystallography Open Database, carregamento mais robusto dos módulos 3D, diagnóstico visível de inicialização e teste automatizado em navegador real.
-
-## Arquitetura de dados
-
-A aplicação não tenta mais baixar automaticamente um CIF do servidor do COD a partir do JavaScript do GitHub Pages.
-
-Para uma estrutura que não esteja na galeria:
-
-1. o usuário informa o COD ID;
-2. o CrystalAR abre a URI oficial `https://www.crystallography.net/cod/{COD_ID}.cif` em outra guia;
-3. o usuário salva o CIF no dispositivo;
-4. o arquivo é aberto localmente no CrystalAR;
-5. o navegador calcula o SHA-256 do texto CIF carregado e apresenta a proveniência.
-
-Esse desenho mantém explícitos o arquivo realmente utilizado, o identificador da estrutura, a versão do aplicativo e a origem dos dados. O upload é processado localmente e não envia o CIF para outro servidor.
-
-## Robustez do navegador
-
-Os módulos do Three.js e do OrbitControls são carregados diretamente pelo jsDelivr. A interface possui um monitor de inicialização que apresenta uma mensagem clara e um botão de recarga caso o módulo 3D, o CDN ou o contexto WebGL não iniciem dentro do tempo esperado.
-
-A integração contínua abre a aplicação em um navegador Chrome real, aguarda o carregamento do exemplo inicial e falha caso a tela permaneça em **Aguardando estrutura**.
+`v0.5.0` — galeria expandida com 16 estruturas, proveniência reproduzível e funcionamento independente de CORS.
 
 ## Galeria didática local
 
-A galeria principal não depende de servidores de dados cristalográficos. Os arquivos CIF selecionados estão versionados no próprio repositório e são processados diretamente pelo navegador.
-
 ### Formas do carbono
 
-- diamante — derivado da entrada experimental COD `9012293`;
-- grafite 2H — derivado da entrada experimental COD `1200017`;
-- grafeno — modelo periódico 2D educacional, com espaçamento de vácuo artificial claramente identificado.
+- diamante — COD `9012293`;
+- grafite 2H — COD `1200017`;
+- grafeno — modelo periódico 2D educacional com vácuo artificial.
+
+### Enxofre molecular
+
+- α-S₈ ortorrômbico — COD `9011362`;
+- β-S₈ monoclínico — COD `4124791`;
+- γ-S₈ monoclínico — COD `2002079`;
+- ciclo-S₆ — COD `9012361`.
+
+A comparação diferencia **polimorfismo** — mesma molécula S₈ em empacotamentos diferentes — de **alotropia molecular**, representada pela mudança de S₈ para S₆.
+
+### Cristal molecular
+
+- iodo sólido, I₂ — COD `9008595`.
 
 ### Sólidos iônicos
 
-- NaCl, estrutura sal-gema — COD `1000041`;
-- CsCl, estrutura tipo CsCl — COD `9008789`;
-- MgO, periclásio — COD `1011173`;
-- CaF₂, fluorita — COD `1000043`.
+- NaCl — COD `1000041`;
+- CsCl — COD `9008789`;
+- MgO — COD `1011173`;
+- CaF₂ — COD `1000043`.
+
+### Redes metal-orgânicas
+
+- MOF-5/IRMOF-1 — COD `1516287`;
+- ZIF-8 — COD `7111973`.
+
+Os MOFs são abertos inicialmente em `1×1×1` e wireframe para reduzir o custo gráfico em celulares.
 
 ### Polimorfos do ZnS
 
 - blenda de zinco — COD `9000107`;
 - wurtzita 2H — COD `1100044`.
 
-Os CIFs experimentais locais são **derivados educacionais**: preservam o COD ID, os parâmetros cristalográficos, a estrutura convencional e a referência bibliográfica, mas foram expandidos explicitamente para renderização estável no navegador. Não são apresentados como cópias intocadas dos arquivos exportados pelo COD.
+## Fluxo reproduzível para outros CIFs
 
-## Proveniência apresentada
+1. informe o COD ID;
+2. abra a URI oficial do COD;
+3. salve o CIF no dispositivo;
+4. abra o arquivo localmente no CrystalAR;
+5. registre COD ID, URI, data, versão do aplicativo e SHA-256.
 
-Para cada estrutura local ou arquivo aberto pelo usuário, o painel registra, quando disponível:
-
-- classificação da estrutura;
-- COD ID;
-- URI oficial do CIF;
-- data de incorporação ao CrystalAR ou indicação de uso na sessão atual;
-- versão do aplicativo;
-- SHA-256 do texto CIF processado no navegador;
-- referência estrutural contida no arquivo.
-
-O botão **Copiar proveniência** produz um bloco de texto que pode ser anexado a relatórios, roteiros de aula e registros de pesquisa.
+O navegador não consulta o COD automaticamente. Essa arquitetura segue a recomendação técnica recebida da equipe do COD e mantém a origem dos dados explícita.
 
 ## Funcionalidades
 
 - galeria local categorizada e responsiva;
-- classificação visível entre dados derivados de determinação experimental e modelo 2D;
-- notas didáticas sobre coordenação, empilhamento e tipo estrutural;
-- abertura da URI oficial a partir de um COD ID;
-- cópia da URI oficial;
-- upload local de arquivos `.cif` e `.mcif`;
-- cálculo SHA-256 no navegador;
-- representação ball-and-stick, space-filling e wireframe;
-- seleção automática de space-filling sem cilindros para sólidos iônicos;
+- ball-and-stick, space-filling e wireframe;
 - cela unitária e supercelas `1×1×1`, `2×2×2` e `3×3×3`;
-- parser CIF executado no navegador;
-- AR com câmera frontal/traseira;
-- rastreamento de mão com MediaPipe HandLandmarker;
-- rotação pela mão, zoom por pinça e fallback por toque, mouse e roda;
-- painel de metadados, proveniência, nota didática e referência.
+- upload local de `.cif` e `.mcif`;
+- cálculo de SHA-256 no navegador;
+- painel de metadados, nota didática, referência e proveniência;
+- WebAR com câmera, rastreamento de mão e fallback por toque ou mouse.
 
 ## Testes
 
 ```bash
 npm run check
 npm test
-npm run smoke:browser
 ```
 
-Os testes validam os CIFs da galeria, parâmetros de cela, coordenadas cartesianas, a identificação explícita do grafeno como modelo educacional, o fluxo reproduzível de abertura da URI oficial e a inicialização completa em navegador real.
+Os testes verificam sintaxe, inicialização real em navegador, parser, galeria, CIFs locais, proveniência e conexão entre os cartões e seus arquivos.
 
 ## Limitações
 
 - o parser cobre CIF 1.1 comum, não todos os casos avançados;
 - ligações são inferidas geometricamente;
-- nos sólidos iônicos, os cilindros são desativados por padrão para evitar a representação enganosa de ligações covalentes localizadas;
-- o grafeno é um modelo periódico 2D com vácuo artificial no eixo perpendicular;
-- os CIFs locais são derivados educacionais de dados experimentais, não exportações integrais e intocadas do COD;
-- o SHA-256 corresponde ao texto CIF decodificado e processado no navegador;
-- supercelas grandes podem reduzir o desempenho em celulares.
+- ocupações parciais e desordem podem exigir curadoria adicional;
+- células de MOFs são grandes e podem reduzir o desempenho em celulares;
+- o grafeno é um modelo 2D educacional, não uma determinação cristalográfica 3D.
 
 ## Fonte e licença
 
-Código: MIT. Dados estruturais derivados do COD: CC0, com reconhecimento dos autores originais e dos COD IDs.
+Código: MIT. Dados locais experimentais: entradas COD disponibilizadas em CC0, com reconhecimento dos autores originais e dos COD IDs.
 
 ## Autor
 

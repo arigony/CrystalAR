@@ -35,6 +35,62 @@ const EDUCATIONAL_EXAMPLES = {
     teachingNote: "Monocamada periódica. O parâmetro c = 20 Å é um espaço de vácuo artificial, não uma dimensão experimental do grafeno.",
     representation: "ball-stick", showBonds: true, supercell: 3
   },
+  sulfurAlpha: {
+    label: "Enxofre α-S₈",
+    path: "examples/sulfur-alpha-9011362.cif",
+    codId: "9011362",
+    provenance: "Determinação experimental COD 9011362",
+    teachingNote: "Polimorfo ortorrômbico do S₈, estável em condições ambientes. A unidade molecular é um anel coroado de oito átomos de enxofre.",
+    representation: "ball-stick", showBonds: true, supercell: 1
+  },
+  sulfurBeta: {
+    label: "Enxofre β-S₈",
+    path: "examples/sulfur-beta-4124791.cif",
+    codId: "4124791",
+    provenance: "Determinação experimental COD 4124791",
+    teachingNote: "Polimorfo monoclínico do S₈. Possui a mesma molécula cíclica do α-S₈, mas outro empacotamento cristalino.",
+    representation: "ball-stick", showBonds: true, supercell: 1
+  },
+  sulfurGamma: {
+    label: "Enxofre γ-S₈",
+    path: "examples/sulfur-gamma-2002079.cif",
+    codId: "2002079",
+    provenance: "Determinação experimental COD 2002079",
+    teachingNote: "Outro polimorfo monoclínico do S₈. Compare a forma da cela e o empacotamento com α-S₈ e β-S₈.",
+    representation: "ball-stick", showBonds: true, supercell: 1
+  },
+  sulfurS6: {
+    label: "Ciclo-S₆",
+    path: "examples/sulfur-s6-9012361.cif",
+    codId: "9012361",
+    provenance: "Determinação experimental COD 9012361",
+    teachingNote: "Alótropo molecular constituído por anéis S₆. Aqui muda a identidade molecular, não apenas o empacotamento do S₈.",
+    representation: "ball-stick", showBonds: true, supercell: 2
+  },
+  iodine: {
+    label: "Iodo sólido — I₂",
+    path: "examples/iodine-9008595.cif",
+    codId: "9008595",
+    provenance: "Determinação experimental COD 9008595",
+    teachingNote: "Cristal molecular formado por moléculas discretas I₂. A ligação intramolecular I–I é distinta das interações intermoleculares no sólido.",
+    representation: "ball-stick", showBonds: true, supercell: 2
+  },
+  mof5: {
+    label: "MOF-5 — IRMOF-1",
+    path: "examples/mof5-1516287.cif",
+    codId: "1516287",
+    provenance: "Determinação experimental COD 1516287",
+    teachingNote: "Rede metal-orgânica cúbica formada por unidades Zn₄O conectadas por ligantes tereftalato (BDC). Observe os grandes vazios periódicos.",
+    representation: "wire", showBonds: true, supercell: 1
+  },
+  zif8: {
+    label: "ZIF-8",
+    path: "examples/zif8-7111973.cif",
+    codId: "7111973",
+    provenance: "Determinação experimental COD 7111973",
+    teachingNote: "Rede de Zn tetraédrico e 2-metilimidazolato, com topologia do tipo sodalita. É um exemplo de MOF com conectividade semelhante à de zeólitas.",
+    representation: "wire", showBonds: true, supercell: 1
+  },
   nacl: {
     label: "NaCl — sal-gema",
     path: "examples/nacl-1000041.cif",

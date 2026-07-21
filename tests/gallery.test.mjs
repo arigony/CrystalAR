@@ -8,6 +8,13 @@ const examples = [
   ["diamond-9012293.cif", "9012293", 8],
   ["graphite-1200017.cif", "1200017", 4],
   ["graphene-model.cif", "graphene_model", 32],
+  ["sulfur-alpha-9011362.cif", "9011362", null],
+  ["sulfur-beta-4124791.cif", "4124791", null],
+  ["sulfur-gamma-2002079.cif", "2002079", null],
+  ["sulfur-s6-9012361.cif", "9012361", null],
+  ["iodine-9008595.cif", "9008595", null],
+  ["mof5-1516287.cif", "1516287", null],
+  ["zif8-7111973.cif", "7111973", null],
   ["nacl-1000041.cif", "1000041", 8],
   ["cscl-9008789.cif", "9008789", 2],
   ["mgo-1011173.cif", "1011173", 8],
@@ -22,7 +29,8 @@ for (const [filename, expectedId, expectedAtoms] of examples) {
     const doc = parseCIFDocument(text);
     const model = buildCrystalModel(doc, 1);
     assert.equal(model.metadata.codId, expectedId);
-    assert.equal(model.unitAtoms.length, expectedAtoms);
+    if (expectedAtoms == null) assert.ok(model.unitAtoms.length > 0);
+    else assert.equal(model.unitAtoms.length, expectedAtoms);
     assert.ok(model.cell.a > 0 && model.cell.b > 0 && model.cell.c > 0);
     assert.ok(model.atoms.every(atom => atom.cart.every(Number.isFinite)));
   });
