@@ -1,0 +1,98 @@
+name: Build validated CrystalAR 5.0.0
+
+on:
+  push:
+    branches: [agent/crystalar-5.0.0]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/crystalar-5.0.0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Load the reviewed 5.0.0 transformation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin v0.5.0-expanded-gallery
+          git show origin/v0.5.0-expanded-gallery:.github/workflows/build-v500.yml > /tmp/build-v500-source.yml
+          python - <<'PY'
+          from pathlib import Path
+
+          lines = Path('/tmp/build-v500-source.yml').read_text(encoding='utf-8').splitlines()
+          scripts = []
+          index = 0
+          while index < len(lines):
+              if lines[index].startswith('        run: |'):
+                  index += 1
+                  captured = []
+                  while index < len(lines):
+                      line = lines[index]
+                      if line.startswith('      - name:') or line.startswith('      - uses:'):
+                          break
+                      captured.append(line[10:] if line.startswith('          ') else line)
+                      index += 1
+                  scripts.append('\n'.join(captured).rstrip() + '\n')
+                  continue
+              index += 1
+
+          if len(scripts) != 4:
+              raise SystemExit(f'Expected four transformation scripts, found {len(scripts)}')
+
+          Path('/tmp/v500-download.sh').write_text('set -euo pipefail\n' + scripts[0], encoding='utf-8')
+          Path('/tmp/v500-implement.sh').write_text('set -euo pipefail\n' + scripts[1], encoding='utf-8')
+          PY
+
+      - name: Download and implement the approved scope
+        shell: bash
+        run: |
+          bash /tmp/v500-download.sh
+          bash /tmp/v500-implement.sh
+
+      - name: Align release label with deployment verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+          text = text.replace('Versão 5.0</span>', 'Versão v5.0.0</span>')
+          index.write_text(text, encoding='utf-8')
+
+          test = Path('tests/reproducible-workflow.test.mjs')
+          text = test.read_text(encoding='utf-8')
+          text = text.replace('/Versão 5\\.0/', '/Versão v5\\.0\\.0/')
+          test.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate syntax, structures and browser startup
+        run: |
+          npm run check
+          npm test
+          npm run smoke:browser
+
+      - name: Commit CrystalAR 5.0.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/build-v500.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Release CrystalAR 5.0.0 educational gallery"
+          git push origin HEAD:agent/crystalar-5.0.0
