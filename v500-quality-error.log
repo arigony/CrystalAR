@@ -1,0 +1,500 @@
+      $("showCell").checked = true;
+      $("supercell").value = String(example.supercell);
+      if (example.codId) $("codId").value = example.codId;
+      try {
+        const response = await fetch(example.path, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Arquivo local respondeu HTTP ${response.status}.`);
+        const text = await response.text();
+        processCIF(text, example.path.split("/").pop(), {
+          source: example.sourceLabel || (example.codId ? `galeria local · COD ${example.codId}` : "galeria local · modelo educacional"),
+          displayName: example.label,
+          provenance: example.provenance,
+          teachingNote: example.teachingNote,
+          experimentalCod: example.codId,
+          exampleKey: key
+        });
+      } catch (error) {
+        setActiveExample("");
+        setStatus(`Não foi possível abrir ${example.label}. ${error.message}`, "error");
+        toast(`Falha ao abrir ${example.label}.`, "error");
+        console.error(error);
+      } finally { hideLoading(); }
+    }
+    
+    async function loadCOD(codId) {
+      const id = String(codId || "").trim();
+      showLoading(`Buscando COD ${id}…`);
+      $("searchButton").disabled = true;
+      setActiveExample("");
+      setStatus(`Consultando COD ${id}…`, "pending");
+      try {
+        const result = await fetchCIFById(id);
+        processCIF(result.text, `${id}.cif`, {
+          source: `${result.source} · COD ${id}`,
+          provenance: "CIF solicitado por COD ID",
+          experimentalCod: id
+        });
+      } catch (error) {
+        const previous = state.displayName || state.model?.metadata?.codId || state.filename || "nenhuma";
+        setStatus(`Falha ao carregar COD ${id}. A visualização anterior (${previous}) foi mantida. ${error.message}`, "error");
+        $("structureMeta").textContent = `BUSCA COD ${id} FALHOU — exibindo a estrutura anterior`;
+        toast(`COD ${id} não foi carregado. Use a galeria local ou abra um CIF.`, "error");
+        console.error(error);
+      } finally {
+        hideLoading();
+        $("searchButton").disabled = false;
+      }
+    }
+    
+    async function handleFile(file) {
+      if (!file) return;
+      showLoading(`Abrindo ${file.name}…`);
+      setActiveExample("");
+      try {
+        processCIF(await file.text(), file.name, {
+          source: `arquivo local: ${file.name}`,
+          provenance: "Arquivo CIF fornecido pelo usuário"
+        });
+      } finally { hideLoading(); }
+    }
+    
+    function rebuildFromState() {
+      if (!state.doc) return;
+      try {
+        const repeat = Number($("supercell").value);
+        const model = buildCrystalModel(state.doc, repeat);
+        const counts = renderer.renderModel(model, currentOptions());
+        state.model = model;
+        renderInfo(model, counts);
+        setStatus(`Visualização atualizada: ${counts.atomCount} átomos na supercela ${repeat} × ${repeat} × ${repeat}.`, "success");
+      } catch (error) {
+        setStatus(error.message, "error");
+        toast(error.message, "error");
+      }
+    }
+    
+    function cameraErrorMessage(error) {
+      if (["NotAllowedError", "SecurityError"].includes(error?.name)) return "A câmera foi bloqueada. Autorize a câmera nas permissões do navegador e toque em AR novamente.";
+      if (["NotFoundError", "OverconstrainedError"].includes(error?.name)) return "Nenhuma câmera compatível foi encontrada neste dispositivo.";
+      if (["NotReadableError", "AbortError"].includes(error?.name)) return "A câmera está ocupada por outro aplicativo ou não pôde ser iniciada.";
+      return error?.message || "Não foi possível iniciar a câmera.";
+    }
+    
+    async function startCamera() {
+      if (!window.isSecureContext) throw new Error("Abra esta página em HTTPS.");
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error("Este navegador não oferece suporte à câmera.");
+      stopCamera();
+      state.stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          width: { ideal: IS_MOBILE ? 640 : 960 },
+          height: { ideal: IS_MOBILE ? 480 : 720 },
+          frameRate: { ideal: IS_MOBILE ? 24 : 30, max: 30 }
+        }
+      });
+      video.srcObject = state.stream;
+      await new Promise((resolve, reject) => {
+        let done = false;
+        const finish = async () => {
+          if (done) return;
+          done = true;
+          try { await video.play(); resolve(); } catch (error) { reject(error); }
+        };
+        video.onloadedmetadata = finish;
+        setTimeout(finish, 700);
+      });
+    }
+    
+    async function buildTracker() {
+      if (state.tracker) return state.tracker;
+      if (state.trackerPromise) return state.trackerPromise;
+      state.trackerPromise = (async () => {
+        const { HandLandmarker, FilesetResolver } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs");
+        const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/wasm");
+        state.tracker = await HandLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+            delegate: "CPU"
+          },
+          runningMode: "VIDEO", numHands: 1,
+          minHandDetectionConfidence: .2, minHandPresenceConfidence: .2, minTrackingConfidence: .2
+        });
+        return state.tracker;
+      })();
+      try { return await state.trackerPromise; }
+      finally { state.trackerPromise = null; }
+    }
+    
+    function drawHandDebug(hand) {
+      if (!handCtx || !DEBUG_HAND) return;
+      const w = innerWidth;
+      const h = innerHeight;
+      handCanvas.width = Math.floor(w * Math.min(devicePixelRatio || 1, 1.5));
+      handCanvas.height = Math.floor(h * Math.min(devicePixelRatio || 1, 1.5));
+      handCanvas.style.width = `${w}px`;
+      handCanvas.style.height = `${h}px`;
+      const dpr = handCanvas.width / w;
+      handCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      handCtx.clearRect(0, 0, w, h);
+      const connections = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+      handCtx.lineWidth = 2;
+      handCtx.strokeStyle = "rgba(30,190,120,.9)";
+      for (const [a,b] of connections) {
+        const pa = hand[a], pb = hand[b];
+        handCtx.beginPath();
+        handCtx.moveTo((1 - pa.x) * w, pa.y * h);
+        handCtx.lineTo((1 - pb.x) * w, pb.y * h);
+        handCtx.stroke();
+      }
+    }
+    function clearHandDebug() { handCtx?.clearRect(0, 0, handCanvas.width, handCanvas.height); }
+    
+    function applyHandPose(hand) {
+      const result = computeHandPose(hand, {
+        isMobile: IS_MOBILE,
+        baseScale: renderer.getARBaseScale(),
+        pinchScaleFactor: state.pinchScaleFactor,
+        lastPinchDistance: state.lastPinchDistance
+      });
+      state.pinchScaleFactor = result.pinchScaleFactor;
+      state.lastPinchDistance = result.lastPinchDistance;
+      state.handSeenAt = performance.now();
+      state.handDetected = true;
+      const quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(result.angleX, result.angleY, result.angleZ));
+      renderer.setARTarget({ position: [0, .08, 0], quaternion, scale: result.scale });
+      setHandStatus(result.isPinching ? "Mão detectada — pinça controla o zoom" : "Mão detectada — gire e incline", true);
+    }
+    
+    function detectStep() {
+      if (!state.arActive || !state.tracker || video.readyState < 2) return;
+      try {
+        const result = state.tracker.detectForVideo(video, performance.now());
+        if (result?.landmarks?.length) {
+          applyHandPose(result.landmarks[0]);
+          drawHandDebug(result.landmarks[0]);
+        } else {
+          state.handDetected = false;
+          if (performance.now() - state.handSeenAt > 900) setHandStatus("Mostre a mão aberta ou use arraste/pinça", false);
+          clearHandDebug();
+        }
+      } catch (error) {
+        setHandStatus("Rastreamento temporariamente indisponível; use toque ou mouse", false);
+        console.warn(error);
+      }
+    }
+    
+    async function startAR() {
+      if (state.arActive) return;
+      if (!state.model) {
+        toast("Carregue uma estrutura antes de iniciar o AR.", "error");
+        return;
+      }
+      showLoading("Iniciando câmera…");
+      try {
+        await startCamera();
+        state.arActive = true;
+        state.pinchScaleFactor = 1;
+        state.lastPinchDistance = null;
+        state.touchScaleFactor = 1;
+        video.classList.add("ar-visible");
+        document.body.classList.add("ar-active");
+        renderer.setAR(true);
+        $("galleryMode").classList.remove("active");
+        $("arMode").classList.add("active");
+        hideLoading();
+        setStatus("AR ativo. Arraste para girar; pinça/roda para zoom. Carregando rastreamento de mãos…", "success");
+        setHandStatus("AR por toque ativo — carregando HandLandmarker…", false);
+        buildTracker().then(() => {
+          if (!state.arActive) return;
+          clearInterval(state.detectTimer);
+          state.detectTimer = setInterval(detectStep, DETECT_INTERVAL_MS);
+          setHandStatus("Mostre a mão aberta ou use arraste/pinça", false);
+          toast("Rastreamento de mãos ativo.", "success");
+        }).catch(error => {
+          console.error(error);
+          if (state.arActive) {
+            setHandStatus("HandLandmarker indisponível; AR por toque e mouse continua ativo", false);
+            toast("Rastreamento de mãos indisponível; use toque ou mouse.", "info");
+          }
+        });
+      } catch (error) {
+        hideLoading();
+        stopAR();
+        const message = cameraErrorMessage(error);
+        setStatus(message, "error");
+        toast(message, "error");
+      }
+    }
+    
+    function stopCamera() {
+      if (state.stream) state.stream.getTracks().forEach(track => track.stop());
+      state.stream = null;
+      video.srcObject = null;
+      video.onloadedmetadata = null;
+    }
+    
+    function stopAR() {
+      clearInterval(state.detectTimer);
+      state.detectTimer = null;
+      state.handDetected = false;
+      stopCamera();
+      video.classList.remove("ar-visible");
+      document.body.classList.remove("ar-active");
+      renderer.setAR(false);
+      state.arActive = false;
+      $("galleryMode").classList.add("active");
+      $("arMode").classList.remove("active");
+      hideHandStatus();
+      clearHandDebug();
+    }
+    
+    function applyManualPose() {
+      const quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(state.touchRotationX, state.touchRotationY, 0));
+      const base = renderer.getARBaseScale();
+      const scale = clamp(base * state.touchScaleFactor, base * .55, base * 1.8);
+      renderer.setARTarget({ position: [0, .08, 0], quaternion, scale });
+    }
+    
+    const canvas = $("scene");
+    canvas.addEventListener("pointerdown", event => {
+      if (!state.arActive) return;
+      state.pointerActive = true;
+      state.pointerX = event.clientX;
+      state.pointerY = event.clientY;
+      canvas.setPointerCapture?.(event.pointerId);
+    });
+    canvas.addEventListener("pointermove", event => {
+      if (!state.arActive || !state.pointerActive) return;
+      state.touchRotationY += (event.clientX - state.pointerX) * .008;
+      state.touchRotationX = clamp(state.touchRotationX + (event.clientY - state.pointerY) * .008, -Math.PI / 2, Math.PI / 2);
+      state.pointerX = event.clientX;
+      state.pointerY = event.clientY;
+      if (!state.handDetected || performance.now() - state.handSeenAt > 700) applyManualPose();
+    });
+    canvas.addEventListener("pointerup", event => {
+      state.pointerActive = false;
+      canvas.releasePointerCapture?.(event.pointerId);
+    });
+    canvas.addEventListener("pointercancel", () => { state.pointerActive = false; });
+    canvas.addEventListener("wheel", event => {
+      if (!state.arActive) return;
+      event.preventDefault();
+      state.touchScaleFactor = clamp(state.touchScaleFactor - event.deltaY * .0012, .55, 1.8);
+      if (!state.handDetected || performance.now() - state.handSeenAt > 700) applyManualPose();
+    }, { passive: false });
+    
+    let touchStartDistance = 0;
+    function touchDistance(touches) { return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY); }
+    canvas.addEventListener("touchstart", event => {
+      if (!state.arActive) return;
+      if (event.touches.length === 2) touchStartDistance = touchDistance(event.touches);
+    }, { passive: true });
+    canvas.addEventListener("touchmove", event => {
+      if (!state.arActive || event.touches.length !== 2) return;
+      event.preventDefault();
+      const distance = touchDistance(event.touches);
+      state.touchScaleFactor = clamp(state.touchScaleFactor + (distance - touchStartDistance) * .0035, .55, 1.8);
+      touchStartDistance = distance;
+      if (!state.handDetected || performance.now() - state.handSeenAt > 700) applyManualPose();
+    }, { passive: false });
+    
+    $("codForm").addEventListener("submit", event => {
+      event.preventDefault();
+      loadCOD($("codId").value);
+    });
+    document.querySelectorAll("[data-example]").forEach(button => {
+      button.addEventListener("click", () => loadLocalExample(button.dataset.example));
+    });
+    $("cifFile").addEventListener("change", event => handleFile(event.target.files?.[0]).catch(error => {
+      hideLoading(); setStatus(error.message, "error"); toast(error.message, "error");
+    }));
+    $("representation").addEventListener("change", rebuildFromState);
+    $("supercell").addEventListener("change", rebuildFromState);
+    $("showCell").addEventListener("change", rebuildFromState);
+    $("showBonds").addEventListener("change", rebuildFromState);
+    $("resetView").addEventListener("click", () => renderer.resetView());
+    $("downloadCif").addEventListener("click", () => {
+      if (!state.text) return;
+      const blob = new Blob([state.text], { type: "chemical/x-cif;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = state.filename || "structure.cif";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    $("collapseControls").addEventListener("click", () => {
+      const panel = document.querySelector(".control-panel");
+      const collapsed = panel.classList.toggle("collapsed");
+      $("collapseControls").textContent = collapsed ? "+" : "−";
+    });
+    $("infoToggle").addEventListener("click", () => {
+      const card = $("infoCard");
+      const expanded = card.classList.toggle("expanded");
+      card.classList.toggle("collapsed", !expanded);
+      $("infoToggle").setAttribute("aria-expanded", expanded ? "true" : "false");
+    });
+    $("arMode").addEventListener("click", startAR);
+    $("galleryMode").addEventListener("click", stopAR);
+    addEventListener("beforeunload", stopCamera);
+    addEventListener("pagehide", stopCamera);
+    
+    loadLocalExample("diamond");
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/CrystalAR/CrystalAR/tests/gallery-v500.test.mjs:29:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: S6 e UiO-66 permanecem fora do escopo 5.0.0
+ok 16 - S6 e UiO-66 permanecem fora do escopo 5.0.0
+  ---
+  duration_ms: 0.515442
+  type: 'test'
+  ...
+# Subtest: galeria: diamond-9012293.cif é um CIF válido e renderizável
+ok 17 - galeria: diamond-9012293.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 10.640935
+  type: 'test'
+  ...
+# Subtest: galeria: graphite-1200017.cif é um CIF válido e renderizável
+ok 18 - galeria: graphite-1200017.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 1.290265
+  type: 'test'
+  ...
+# Subtest: galeria: graphene-model.cif é um CIF válido e renderizável
+ok 19 - galeria: graphene-model.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 1.230427
+  type: 'test'
+  ...
+# Subtest: galeria: sulfur-alpha-9011362.cif é um CIF válido e renderizável
+ok 20 - galeria: sulfur-alpha-9011362.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 2.592078
+  type: 'test'
+  ...
+# Subtest: galeria: sulfur-beta-4124791.cif é um CIF válido e renderizável
+ok 21 - galeria: sulfur-beta-4124791.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 1.90287
+  type: 'test'
+  ...
+# Subtest: galeria: sulfur-gamma-2002079.cif é um CIF válido e renderizável
+ok 22 - galeria: sulfur-gamma-2002079.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 1.80431
+  type: 'test'
+  ...
+# Subtest: galeria: mof5-clean.cif é um CIF válido e renderizável
+ok 23 - galeria: mof5-clean.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 2.060754
+  type: 'test'
+  ...
+# Subtest: galeria: hkust1-clean.cif é um CIF válido e renderizável
+ok 24 - galeria: hkust1-clean.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 2.228992
+  type: 'test'
+  ...
+# Subtest: galeria: zif8-clean.cif é um CIF válido e renderizável
+ok 25 - galeria: zif8-clean.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 2.939861
+  type: 'test'
+  ...
+# Subtest: galeria: nacl-1000041.cif é um CIF válido e renderizável
+ok 26 - galeria: nacl-1000041.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 1.727191
+  type: 'test'
+  ...
+# Subtest: galeria: cscl-9008789.cif é um CIF válido e renderizável
+ok 27 - galeria: cscl-9008789.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 0.897666
+  type: 'test'
+  ...
+# Subtest: galeria: mgo-1011173.cif é um CIF válido e renderizável
+ok 28 - galeria: mgo-1011173.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 0.760934
+  type: 'test'
+  ...
+# Subtest: galeria: caf2-1000043.cif é um CIF válido e renderizável
+ok 29 - galeria: caf2-1000043.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 1.055178
+  type: 'test'
+  ...
+# Subtest: galeria: zns-sphalerite-9000107.cif é um CIF válido e renderizável
+ok 30 - galeria: zns-sphalerite-9000107.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 0.754083
+  type: 'test'
+  ...
+# Subtest: galeria: zns-wurtzite-1100044.cif é um CIF válido e renderizável
+ok 31 - galeria: zns-wurtzite-1100044.cif é um CIF válido e renderizável
+  ---
+  duration_ms: 0.945616
+  type: 'test'
+  ...
+# Subtest: grafeno é explicitamente identificado como modelo educacional
+ok 32 - grafeno é explicitamente identificado como modelo educacional
+  ---
+  duration_ms: 1.680496
+  type: 'test'
+  ...
+# Subtest: MOFs são marcados como modelos educacionais limpos
+ok 33 - MOFs são marcados como modelos educacionais limpos
+  ---
+  duration_ms: 0.897175
+  type: 'test'
+  ...
+# Subtest: a interface apresenta CrystalAR 5.0 e o fluxo em duas etapas
+ok 34 - a interface apresenta CrystalAR 5.0 e o fluxo em duas etapas
+  ---
+  duration_ms: 1.003803
+  type: 'test'
+  ...
+# Subtest: o formulário abre a URI oficial sem iniciar busca remota
+ok 35 - o formulário abre a URI oficial sem iniciar busca remota
+  ---
+  duration_ms: 0.180977
+  type: 'test'
+  ...
+# Subtest: a proveniência inclui versão, identificador, URI e SHA-256
+ok 36 - a proveniência inclui versão, identificador, URI e SHA-256
+  ---
+  duration_ms: 0.254786
+  type: 'test'
+  ...
+# Subtest: o carregamento 3D usa jsDelivr e possui recuperação visível
+ok 37 - o carregamento 3D usa jsDelivr e possui recuperação visível
+  ---
+  duration_ms: 0.165755
+  type: 'test'
+  ...
+# Subtest: a galeria mantém quinze estruturas locais
+ok 38 - a galeria mantém quinze estruturas locais
+  ---
+  duration_ms: 0.185484
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 31
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 154.65588
