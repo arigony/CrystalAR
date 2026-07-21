@@ -1,5 +1,0 @@
-/tmp/v050-step-1.sh: line 23: warning: here-document at line 2 delimited by end-of-file (wanted `PY')
-  File "<stdin>", line 21
-    insert = '''
-             ^
-SyntaxError: unterminated triple-quoted string literal (detected at line 21)
