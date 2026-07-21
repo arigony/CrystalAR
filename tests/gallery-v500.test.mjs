@@ -17,22 +17,22 @@ function exampleBlock(key) {
   return app.slice(start, end + 5);
 }
 
-test("CrystalAR 5.0.0 apresenta polimorfismo e materiais porosos", () => {
-  assert.equal(packageJson.version, "5.0.0");
+test("CrystalAR 5.1.0 preserva polimorfismo e materiais porosos da 5.0", () => {
+  assert.equal(packageJson.version, "5.1.0");
   assert.match(index, /Enxofre molecular/);
   assert.match(index, /Redes metal-orgânicas/);
   assert.match(index, /HKUST-1/);
 });
 
 for (const key of keys) {
-  test(`exemplo ${key} está conectado à interface e à proveniência`, () => {
+  test(`exemplo ${key} permanece conectado à interface e à proveniência`, () => {
     assert.ok(index.includes(`data-example="${key}"`));
     assert.ok(app.includes(`  ${key}: {`));
     assert.ok(provenance.includes(`    ${key}: {`));
   });
 }
 
-test("MOFs usam wireframe e cela 1 × 1 × 1", () => {
+test("MOFs preservam wireframe e cela 1 × 1 × 1", () => {
   for (const key of ["mof5", "hkust1", "zif8"]) {
     const block = exampleBlock(key);
     assert.match(block, /representation: "wire"/);
@@ -40,7 +40,7 @@ test("MOFs usam wireframe e cela 1 × 1 × 1", () => {
   }
 });
 
-test("S6 e UiO-66 permanecem fora do escopo 5.0.0", () => {
+test("S6 e UiO-66 permanecem fora do escopo 5.1.0", () => {
   assert.doesNotMatch(index, /data-example=["']sulfurS6["']/);
   assert.doesNotMatch(index, /UiO-66/i);
   assert.doesNotMatch(app, /sulfurS6:/);
