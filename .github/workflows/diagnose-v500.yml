@@ -1,0 +1,39 @@
+name: Diagnose CrystalAR 5.0.0 tests
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/crystalar-5.0.0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Capture test output
+        shell: bash
+        run: |
+          set +e
+          npm test > /tmp/v500-quality.log 2>&1
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ]; then
+            tail -n 500 /tmp/v500-quality.log > v500-quality-error.log
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add v500-quality-error.log
+            git commit -m "Capture CrystalAR 5.0.0 quality diagnostic"
+            git push origin HEAD:agent/crystalar-5.0.0
+            cat v500-quality-error.log
+            exit "$status"
+          fi
+          cat /tmp/v500-quality.log
