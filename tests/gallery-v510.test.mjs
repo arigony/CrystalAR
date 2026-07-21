@@ -5,6 +5,8 @@ import { parseCIFDocument } from "../src/cif-parser.js";
 import { buildCrystalModel, inferBonds } from "../src/crystal.js";
 import { SCIENCE_EXAMPLES, LESSON_FAMILIES } from "../src/science-presets.js";
 
+const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
+const scienceModule = await readFile(new URL("../src/science-v510.js", import.meta.url), "utf8");
 const expectedCounts = { tio2Rutile: 6, tio2Anatase: 12, tio2Brookite: 24, caco3Calcite: 30, caco3Aragonite: 20 };
 
 test("package and scientific release are version 5.1.1", async () => {
@@ -12,6 +14,17 @@ test("package and scientific release are version 5.1.1", async () => {
   assert.equal(pkg.version, "5.1.1");
   const loader = await readFile(new URL("../src/runtime-watchdog.js", import.meta.url), "utf8");
   assert.match(loader, /science-v510\.js\?v=5\.1\.1/);
+  assert.match(scienceModule, /const VERSION = "v5\.1\.1"/);
+});
+
+test("HTML-base exposes 5.1.1 before JavaScript enhancement", () => {
+  assert.match(index, /Versão v5\.1\.1/);
+  assert.match(index, /Vinte e uma estruturas/);
+  assert.match(index, /style-v510\.css\?v=5\.1\.1/);
+  assert.match(index, /runtime-watchdog\.js\?v=5\.1\.1/);
+  assert.match(index, /provenance\.js\?v=5\.1\.1/);
+  assert.match(index, /app\.js\?v=5\.1\.1/);
+  assert.doesNotMatch(index, /\?v=5\.0\.0/);
 });
 
 test("two lesson families contain three polymorphs each", () => {

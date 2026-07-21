@@ -4,55 +4,44 @@
 
 ## Versão
 
-`5.1.0` — **Comparação científica de polimorfos, coordenação e ocupação cristalográfica**.
+`5.1.1` — **Comparação científica de polimorfos, coordenação e ocupação cristalográfica**.
 
-A versão 5.1 mantém as quinze estruturas da 5.0 e acrescenta seis derivados educacionais de determinações experimentais do COD, totalizando **21 estruturas**. Os novos roteiros não tratam linhas geométricas indistintamente como “ligações”: regras específicas separam ligações covalentes de contatos de coordenação.
+A versão 5.1 reúne **21 estruturas**. A correção 5.1.1 torna a versão científica explícita no HTML inicial, atualiza o cache dos arquivos estáticos, sincroniza a proveniência e amplia o teste em navegador real.
 
-## Novos roteiros comparativos
+## Roteiros comparativos
 
-### TiO₂: mesma fórmula, diferentes redes de octaedros
+### TiO₂
 
-- rutilo — COD `9015662`, grupo original P4₂/mnm;
-- anatásio — COD `9015929`, grupo original I4₁/amd;
-- brookita — COD `9004137`, grupo original Pbca.
+- rutilo — COD `9015662`, P4₂/mnm;
+- anatásio — COD `9015929`, I4₁/amd;
+- brookita — COD `9004137`, Pbca.
 
-O roteiro orienta a comparação de sistema cristalino, cela, distorção e conectividade dos octaedros TiO₆. A visualização usa regras Ti–O explícitas e pode gerar poliedros de coordenação.
+O roteiro compara cela, conectividade e distorção dos octaedros TiO₆.
 
-### CaCO₃: coordenação, empacotamento e desordem
+### CaCO₃
 
-- calcita — COD `9000095`, grupo original R-3c;
-- aragonita — COD `9000229`, grupo original Pmcn;
-- vaterita — COD `9007475`, modelo médio histórico P6₃/mmc de Kamhi.
+- calcita — COD `9000095`, R-3c;
+- aragonita — COD `9000229`, Pmcn;
+- vaterita — COD `9007475`, modelo médio histórico P6₃/mmc.
 
-O aplicativo distingue ligações covalentes C–O de contatos Ca–O. Na vaterita, as posições de ocupação `1/3` são mostradas com transparência e acompanhadas de alerta: orientações alternativas parcialmente ocupadas não devem ser interpretadas como presentes simultaneamente.
+O aplicativo distingue ligações C–O de contatos Ca–O. Na vaterita, posições com ocupação `1/3` aparecem com transparência e alerta de interpretação.
 
 ## Integridade cristalográfica
 
-Os seis novos arquivos são derivados educacionais **expandidos em P1** a partir das coordenadas e operações de simetria das entradas COD citadas. Essa decisão:
+Os seis novos arquivos são derivados educacionais expandidos em P1. COD ID, autores, parâmetros da cela e grupo espacial original permanecem registrados. Os arquivos locais não são apresentados como CIFs experimentais intactos.
 
-- preserva o COD ID, os autores e os parâmetros da cela;
-- registra o grupo espacial original no arquivo e na interface;
-- evita depender da interpretação de configurações avançadas pelo parser;
-- torna explícito que o arquivo local é um derivado, não o CIF experimental intacto.
-
-## Funcionalidades científicas e pedagógicas
+## Funcionalidades
 
 - 21 estruturas em sete famílias;
-- roteiro guiado para alternar entre três polimorfos relacionados;
-- regras de distância específicas para Ti–O, C–O e Ca–O;
-- distinção visual entre ligação covalente e coordenação;
-- poliedros TiO₆ e CaOₙ opcionais;
-- medição interativa de distâncias e ângulos por seleção de átomos;
-- representação semitransparente de ocupações parciais;
-- perguntas orientadoras e alertas de interpretação;
+- roteiro guiado de polimorfos;
+- regras específicas para Ti–O, C–O e Ca–O;
+- poliedros de coordenação opcionais;
+- medição de distâncias e ângulos;
+- representação de ocupações parciais;
 - ball-and-stick, space-filling e wireframe;
-- cela unitária e supercelas `1 × 1 × 1`, `2 × 2 × 2` e `3 × 3 × 3`;
-- upload local de `.cif` e `.mcif`, SHA-256 e proveniência;
+- celas unitárias e supercelas;
+- upload local de CIF, SHA-256 e proveniência;
 - WebAR com rastreamento de mão e fallback por toque.
-
-## Galeria preservada da versão 5.0
-
-Carbono: diamante, grafite e grafeno. Enxofre: α-S₈, β-S₈ e γ-S₈. Sólidos iônicos: NaCl, CsCl, MgO e CaF₂. MOFs: MOF-5, HKUST-1 e ZIF-8. ZnS: blenda e wurtzita.
 
 ## Testes
 
@@ -62,19 +51,18 @@ npm test
 npm run smoke:browser
 ```
 
-Os testes da versão 5.1 verificam sintaxe, seis novos CIFs, COD IDs, fórmulas, grupos originais, número de átomos após expansão, ocupação parcial da vaterita, regras químicas e integração da interface.
+Os testes verificam os CIFs, ocupação parcial, regras químicas, versão exibida no HTML e no DOM, famílias TiO₂ e CaCO₃, controles científicos e inicialização no Chrome.
 
 ## Limitações
 
-- a inferência genérica permanece para estruturas antigas, enquanto os novos roteiros usam regras explícitas;
-- poliedros próximos às fronteiras podem exigir supercela `2 × 2 × 2` para completar a coordenação;
-- a vaterita COD `9007475` é um modelo médio histórico, não uma solução estrutural ordenada definitiva;
-- o parser registra desordem e ocupação, mas não escolhe automaticamente uma configuração ordenada;
+- estruturas antigas ainda podem usar inferência geométrica genérica;
+- poliedros nas fronteiras podem exigir supercela `2 × 2 × 2`;
+- a vaterita selecionada é um modelo médio histórico;
 - supercelas grandes podem reduzir o desempenho em celulares.
 
 ## Fonte e licença
 
-Código: MIT. Dados COD: CC0, com reconhecimento dos autores originais. Modelos de MOFs: derivados educacionais da coleção pública identificada no painel de proveniência.
+Código: MIT. Dados COD: CC0, com reconhecimento dos autores originais. Modelos de MOFs: derivados educacionais identificados no painel de proveniência.
 
 ## Autor
 

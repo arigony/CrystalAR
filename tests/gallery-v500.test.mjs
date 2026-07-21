@@ -17,8 +17,8 @@ function exampleBlock(key) {
   return app.slice(start, end + 5);
 }
 
-test("CrystalAR 5.1.0 preserva polimorfismo e materiais porosos da 5.0", () => {
-  assert.equal(packageJson.version, "5.1.0");
+test("CrystalAR 5.1.1 preserva polimorfismo e materiais porosos da 5.0", () => {
+  assert.equal(packageJson.version, "5.1.1");
   assert.match(index, /Enxofre molecular/);
   assert.match(index, /Redes metal-orgânicas/);
   assert.match(index, /HKUST-1/);
@@ -40,7 +40,7 @@ test("MOFs preservam wireframe e cela 1 × 1 × 1", () => {
   }
 });
 
-test("S6 e UiO-66 permanecem fora do escopo 5.1.0", () => {
+test("S6 e UiO-66 permanecem fora do escopo 5.1.1", () => {
   assert.doesNotMatch(index, /data-example=["']sulfurS6["']/);
   assert.doesNotMatch(index, /UiO-66/i);
   assert.doesNotMatch(app, /sulfurS6:/);
