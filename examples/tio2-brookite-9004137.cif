@@ -1,0 +1,67 @@
+data_9004137_P1_educational
+# CrystalAR 5.1.0 educational derivative.
+# Expanded to P1 from COD 9004137; original space group: P b c a (No. 61).
+# Fractional coordinates are symmetry-expanded from the cited structural determination.
+# COD data are CC0; acknowledge the original structural authors.
+_cod_database_code 9004137
+_chemical_name_mineral 'Brookite'
+_chemical_name_common 'Brookite — expanded P1 educational derivative'
+_chemical_formula_sum 'O2 Ti'
+_space_group_name_H-M_alt 'P 1'
+_space_group_IT_number 1
+_cod_original_sg_symbol_H-M 'P b c a'
+_cod_original_sg_number 61
+_cell_length_a 9.174
+_cell_length_b 5.449
+_cell_length_c 5.138
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 256.84413
+_cell_formula_units_Z 8
+_publ_section_title 'Polyhedral thermal expansion in the TiO2 polymorphs: refinement of the crystal structures of rutile and brookite at high temperature'
+_journal_name_full 'The Canadian Mineralogist'
+_journal_year 1979
+_journal_volume 17
+_journal_page_first 77
+_journal_page_last 85
+loop_
+_publ_author_name
+'Meagher, E. P.'
+'Lager, G. A.'
+loop_
+_space_group_symop_id
+_space_group_symop_operation_xyz
+1 x,y,z
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_disorder_group
+Ti1 Ti 0.12890000 0.09720000 0.86280000 1.00000 .
+Ti2 Ti 0.37110000 0.90280000 0.36280000 1.00000 .
+Ti3 Ti 0.62890000 0.40280000 0.13720000 1.00000 .
+Ti4 Ti 0.87110000 0.59720000 0.63720000 1.00000 .
+Ti5 Ti 0.87110000 0.90280000 0.13720000 1.00000 .
+Ti6 Ti 0.62890000 0.09720000 0.63720000 1.00000 .
+Ti7 Ti 0.37110000 0.59720000 0.86280000 1.00000 .
+Ti8 Ti 0.12890000 0.40280000 0.36280000 1.00000 .
+O1 O 0.00950000 0.14910000 0.18350000 1.00000 .
+O2 O 0.49050000 0.85090000 0.68350000 1.00000 .
+O3 O 0.50950000 0.35090000 0.81650000 1.00000 .
+O4 O 0.99050000 0.64910000 0.31650000 1.00000 .
+O5 O 0.99050000 0.85090000 0.81650000 1.00000 .
+O6 O 0.50950000 0.14910000 0.31650000 1.00000 .
+O7 O 0.49050000 0.64910000 0.18350000 1.00000 .
+O8 O 0.00950000 0.35090000 0.68350000 1.00000 .
+O9 O 0.23140000 0.11100000 0.53660000 1.00000 .
+O10 O 0.26860000 0.88900000 0.03660000 1.00000 .
+O11 O 0.73140000 0.38900000 0.46340000 1.00000 .
+O12 O 0.76860000 0.61100000 0.96340000 1.00000 .
+O13 O 0.76860000 0.88900000 0.46340000 1.00000 .
+O14 O 0.73140000 0.11100000 0.96340000 1.00000 .
+O15 O 0.26860000 0.61100000 0.53660000 1.00000 .
+O16 O 0.23140000 0.38900000 0.03660000 1.00000 .
