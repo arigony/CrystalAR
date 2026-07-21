@@ -16,6 +16,10 @@ A versão 5.0.0 amplia a galeria de 9 para 15 estruturas e introduz duas novas f
 - identificadores EDUSIF, FIQCEN e OFERUN e URI da fonte preservados;
 - SHA-256 calculado no navegador.
 
+### Validação
+
+A entrega foi verificada com análise de sintaxe, testes automatizados dos quinze arquivos estruturais e inicialização completa em navegador Chrome real.
+
 ### Decisões de escopo
 
 S₆ e UiO-66 foram adiados. A UiO-66 exige tratamento explícito de desordem e ocupações fracionárias. Superfícies de poros e separação automática de nós, ligantes e hóspedes ficam para uma versão posterior.
