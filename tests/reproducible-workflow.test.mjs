@@ -9,7 +9,7 @@ const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
 const renderer = await readFile(new URL("../src/renderer.js", import.meta.url), "utf8");
 
 test("a interface apresenta a versão 0.4.1 e o fluxo em duas etapas", () => {
-  assert.match(index, /Versão v0\.4\.1/);
+  assert.match(index, /Versão v0\.5\.0/);
   assert.match(index, /Abrir a URI oficial/);
   assert.match(index, /Abrir o CIF baixado/);
   assert.match(index, /O CrystalAR não baixa dados do COD automaticamente/);
@@ -33,12 +33,12 @@ test("o carregamento 3D usa jsDelivr e possui recuperação visível", () => {
   assert.match(index, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
   assert.match(app, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
   assert.match(renderer, /cdn\.jsdelivr\.net\/npm\/three@0\.160\.0/);
-  assert.match(index, /runtime-watchdog\.js\?v=0\.4\.1/);
+  assert.match(index, /runtime-watchdog\.js\?v=0\.5\.0/);
   assert.match(watchdog, /A estrutura inicial não foi carregada/);
   assert.match(index, /Recarregar visualizador/);
 });
 
-test("a galeria mantém nove estruturas locais", () => {
+test("a galeria mantém dezesseis estruturas locais", () => {
   const exampleButtons = index.match(/data-example=/g) || [];
-  assert.equal(exampleButtons.length, 9);
+  assert.equal(exampleButtons.length, 16);
 });

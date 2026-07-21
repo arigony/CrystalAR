@@ -1,14 +1,21 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "v0.4.1";
-  const INCORPORATED_ON = "20/07/2026";
+  const APP_VERSION = "v0.5.0";
+  const INCORPORATED_ON = "21/07/2026";
   const COD_BASE = "https://www.crystallography.net/cod/";
 
   const EXAMPLES = {
     diamond: { label: "Diamante", path: "examples/diamond-9012293.cif", codId: "9012293", type: "Derivado de determinação experimental COD" },
     graphite: { label: "Grafite 2H", path: "examples/graphite-1200017.cif", codId: "1200017", type: "Derivado de determinação experimental COD" },
     graphene: { label: "Grafeno", path: "examples/graphene-model.cif", codId: "", type: "Modelo periódico 2D educacional" },
+    sulfurAlpha: { label: "Enxofre α-S₈", path: "examples/sulfur-alpha-9011362.cif", codId: "9011362", type: "Determinação experimental COD" },
+    sulfurBeta: { label: "Enxofre β-S₈", path: "examples/sulfur-beta-4124791.cif", codId: "4124791", type: "Determinação experimental COD" },
+    sulfurGamma: { label: "Enxofre γ-S₈", path: "examples/sulfur-gamma-2002079.cif", codId: "2002079", type: "Determinação experimental COD" },
+    sulfurS6: { label: "Ciclo-S₆", path: "examples/sulfur-s6-9012361.cif", codId: "9012361", type: "Determinação experimental COD" },
+    iodine: { label: "Iodo sólido — I₂", path: "examples/iodine-9008595.cif", codId: "9008595", type: "Determinação experimental COD" },
+    mof5: { label: "MOF-5 — IRMOF-1", path: "examples/mof5-1516287.cif", codId: "1516287", type: "Determinação experimental COD" },
+    zif8: { label: "ZIF-8", path: "examples/zif8-7111973.cif", codId: "7111973", type: "Determinação experimental COD" },
     nacl: { label: "NaCl — sal-gema", path: "examples/nacl-1000041.cif", codId: "1000041", type: "Derivado de determinação experimental COD" },
     cscl: { label: "CsCl", path: "examples/cscl-9008789.cif", codId: "9008789", type: "Derivado de determinação experimental COD" },
     mgo: { label: "MgO — periclásio", path: "examples/mgo-1011173.cif", codId: "1011173", type: "Derivado de determinação experimental COD" },
