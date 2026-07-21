@@ -28,10 +28,10 @@ jobs:
         run: |
           set -euo pipefail
           version="$(node -p "require('./package.json').version")"
-          url="https://arigony.github.io/CrystalAR/?commit=${GITHUB_SHA}"
+          url="https://arigony.github.io/CrystalAR/package.json?commit=${GITHUB_SHA}"
           for attempt in $(seq 1 24); do
-            page="$(curl -fsSL --retry 2 --max-time 20 "$url" || true)"
-            if grep -q "Versão v${version}" <<<"$page"; then
+            published="$(curl -fsSL --retry 2 --max-time 20 "$url" || true)"
+            if node -e 'const fs=require("fs"); const expected=process.argv[1]; const data=JSON.parse(fs.readFileSync(0,"utf8")); process.exit(data.version===expected?0:1)' "$version" <<<"$published"; then
               echo "Published CrystalAR v${version} verified on attempt ${attempt}."
               exit 0
             fi
