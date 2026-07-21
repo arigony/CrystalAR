@@ -4,7 +4,7 @@
 
 ## Versão
 
-`v0.4.0` — fluxo reproduzível para dados do Crystallography Open Database: galeria local versionada, abertura da URI oficial do COD, carregamento local do CIF e registro de proveniência com SHA-256.
+`v0.4.1` — fluxo reproduzível para dados do Crystallography Open Database: galeria local versionada, abertura da URI oficial do COD, carregamento local do CIF e registro de proveniência com SHA-256.
 
 ## Arquitetura de dados
 
