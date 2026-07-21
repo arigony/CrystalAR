@@ -1,0 +1,50 @@
+data_9015662_P1_educational
+# CrystalAR 5.1.0 educational derivative.
+# Expanded to P1 from COD 9015662; original space group: P 42/m n m (No. 136).
+# Fractional coordinates are symmetry-expanded from the cited structural determination.
+# COD data are CC0; acknowledge the original structural authors.
+_cod_database_code 9015662
+_chemical_name_mineral 'Rutile'
+_chemical_name_common 'Rutile — expanded P1 educational derivative'
+_chemical_formula_sum 'O2 Ti'
+_space_group_name_H-M_alt 'P 1'
+_space_group_IT_number 1
+_cod_original_sg_symbol_H-M 'P 42/m n m'
+_cod_original_sg_number 136
+_cell_length_a 4.5937
+_cell_length_b 4.5937
+_cell_length_c 2.9587
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_cell_volume 62.43472
+_cell_formula_units_Z 2
+_publ_section_title 'Structural and thermal parameters for rutile and anatase'
+_journal_name_full 'Acta Crystallographica, Section B'
+_journal_year 1991
+_journal_volume 47
+_journal_page_first 462
+_journal_page_last 468
+loop_
+_publ_author_name
+'Howard, C. J.'
+'Sabine, T. M.'
+'Dickson, F.'
+loop_
+_space_group_symop_id
+_space_group_symop_operation_xyz
+1 x,y,z
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_disorder_group
+Ti1 Ti 0.00000000 0.00000000 0.00000000 1.00000 .
+Ti2 Ti 0.50000000 0.50000000 0.50000000 1.00000 .
+O1 O 0.30478000 0.30478000 0.00000000 1.00000 .
+O2 O 0.19522000 0.80478000 0.50000000 1.00000 .
+O3 O 0.69522000 0.69522000 0.00000000 1.00000 .
+O4 O 0.80478000 0.19522000 0.50000000 1.00000 .
