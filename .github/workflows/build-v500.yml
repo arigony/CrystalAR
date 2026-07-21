@@ -3,6 +3,8 @@ name: Build validated CrystalAR 5.0.0
 on:
   push:
     branches: [agent/crystalar-5.0.0]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
