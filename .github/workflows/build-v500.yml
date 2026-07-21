@@ -83,16 +83,33 @@ jobs:
           PY
 
       - name: Validate syntax, structures and browser startup
+        shell: bash
         run: |
-          npm run check
-          npm test
-          npm run smoke:browser
+          set +e
+          {
+            npm run check
+            npm test
+            npm run smoke:browser
+          } > /tmp/v500-validation.log 2>&1
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ]; then
+            tail -n 400 /tmp/v500-validation.log > v500-validation-error.log
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add v500-validation-error.log
+            git commit -m "Capture CrystalAR 5.0.0 validation diagnostic"
+            git push origin HEAD:agent/crystalar-5.0.0
+            cat v500-validation-error.log
+            exit "$status"
+          fi
+          cat /tmp/v500-validation.log
 
       - name: Commit CrystalAR 5.0.0
         shell: bash
         run: |
           set -euo pipefail
-          rm -f .github/workflows/build-v500.yml
+          rm -f .github/workflows/build-v500.yml v500-validation-error.log
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
