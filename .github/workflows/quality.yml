@@ -22,3 +22,21 @@ jobs:
       - run: npm test
       - name: Verify real browser startup
         run: npm run smoke:browser
+      - name: Verify published GitHub Pages version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          url="https://arigony.github.io/CrystalAR/?commit=${GITHUB_SHA}"
+          for attempt in $(seq 1 24); do
+            page="$(curl -fsSL --retry 2 --max-time 20 "$url" || true)"
+            if grep -q "Versão v${version}" <<<"$page"; then
+              echo "Published CrystalAR v${version} verified on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Attempt ${attempt}: GitHub Pages has not published v${version} yet."
+            sleep 10
+          done
+          echo "GitHub Pages did not publish CrystalAR v${version} within the verification window."
+          exit 1
