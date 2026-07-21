@@ -2,12 +2,12 @@ import { parseCIFDocument } from "./cif-parser.js";
 import { buildCrystalModel } from "./crystal.js";
 import { LESSON_FAMILIES, SCIENCE_EXAMPLES } from "./science-presets.js";
 
-const VERSION = "v5.1.0", INCORPORATED_ON = "21/07/2026", $ = id => document.getElementById(id);
+const VERSION = "v5.1.1", INCORPORATED_ON = "21/07/2026", $ = id => document.getElementById(id);
 const state = { key: "", text: "", filename: "", doc: null, model: null, measure: false, family: "tio2" };
 
 function injectStyle() {
   if (document.querySelector('link[data-crystalar-v510]')) return;
-  const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "style-v510.css?v=5.1.0"; link.dataset.crystalarV510 = "true"; document.head.appendChild(link);
+  const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "style-v510.css?v=5.1.1"; link.dataset.crystalarV510 = "true"; document.head.appendChild(link);
 }
 function cardsFor(family) {
   return Object.entries(SCIENCE_EXAMPLES).filter(([,item]) => item.family === family).map(([key,item]) => `
@@ -16,9 +16,10 @@ function cardsFor(family) {
     </button>`).join("");
 }
 function injectInterface() {
-  document.title = "CrystalAR 5.1 — comparação científica de polimorfos";
+  if (document.getElementById("scienceGallery510")) return;
+  document.title = "CrystalAR 5.1.1 — comparação científica de polimorfos";
   document.querySelector(".panel-heading .eyebrow").textContent = `Versão ${VERSION}`;
-  const brandText = document.querySelector(".brand p"); if (brandText) brandText.textContent = "21 estruturas · polimorfismo · coordenação · ocupação · WebAR";
+  const brandText = document.querySelector(".brand p"); if (brandText) brandText.textContent = "21 estruturas · polimorfismo · coordenação · ocupação · proveniência · WebAR";
   const intro = document.querySelector(".gallery-intro"); if (intro) intro.textContent = "Vinte e uma estruturas para comparar redes, polimorfismo, coordenação, materiais porosos e ocupação cristalográfica. Dados experimentais e derivados educacionais são identificados separadamente.";
   $("provVersion").textContent = VERSION;
   const divider = document.querySelector(".control-body > .divider");
@@ -95,7 +96,7 @@ function wireEvents() {
   $("measureMode").addEventListener("click",async()=>{if(!state.key){toast("Abra uma estrutura do roteiro científico antes de medir.","info");return;} const renderer=await rendererReady(); state.measure=!state.measure; $("measureMode").setAttribute("aria-pressed",String(state.measure)); $("measureMode").classList.toggle("active",state.measure); $("measureMode").textContent=state.measure?"Encerrar medição":"Medir distância/ângulo"; renderer.setMeasurementMode(state.measure,result=>{$("measurementResult").textContent=result.text;}); $("measurementResult").textContent=state.measure?"Toque em dois átomos para distância; em três para ângulo.":"Medição encerrada.";});
   $("downloadCif").addEventListener("click",event=>{if(!state.key)return;event.stopImmediatePropagation();const url=URL.createObjectURL(new Blob([state.text],{type:"chemical/x-cif;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download=state.filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);},true);
   $("openOfficialCif").addEventListener("click",event=>{if(!state.key)return;event.preventDefault();event.stopImmediatePropagation();const e=SCIENCE_EXAMPLES[state.key];window.open(`https://www.crystallography.net/cod/${e.codId}.cif`,"_blank","noopener,noreferrer");},true);
-  $("copyProvenance").addEventListener("click",async event=>{event.preventDefault();event.stopImmediatePropagation();const text=[`Estrutura/arquivo: ${$("structureName").textContent}`,`Tipo: ${$("provType").textContent}`,`COD ID: ${$("provCodId").textContent}`,`URI da fonte: ${$("provUri").textContent}`,`Data de incorporação/uso: ${$("provDate").textContent}`,`Versão do aplicativo: CrystalAR ${VERSION}`,`SHA-256 do texto CIF carregado: ${$("provHash").textContent}`,$("citationBox")?.textContent||""].filter(Boolean).join("\n");try{await navigator.clipboard.writeText(text);toast("Proveniência 5.1 copiada.","success");}catch{toast("Não foi possível copiar a proveniência.","error");}},true);
+  $("copyProvenance").addEventListener("click",async event=>{event.preventDefault();event.stopImmediatePropagation();const text=[`Estrutura/arquivo: ${$("structureName").textContent}`,`Tipo: ${$("provType").textContent}`,`COD ID: ${$("provCodId").textContent}`,`URI da fonte: ${$("provUri").textContent}`,`Data de incorporação/uso: ${$("provDate").textContent}`,`Versão do aplicativo: CrystalAR ${VERSION}`,`SHA-256 do texto CIF carregado: ${$("provHash").textContent}`,$("citationBox")?.textContent||""].filter(Boolean).join("\n");try{await navigator.clipboard.writeText(text);toast("Proveniência 5.1.1 copiada.","success");}catch{toast("Não foi possível copiar a proveniência.","error");}},true);
   $("codForm").addEventListener("submit",deactivateScience,true); $("cifFile").addEventListener("change",deactivateScience,true);
 }
 
