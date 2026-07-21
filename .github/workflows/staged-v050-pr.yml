@@ -1,0 +1,57 @@
+name: Stage CrystalAR v0.5.0 builder
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  staged-builder:
+    if: github.actor != 'github-actions[bot]' && github.head_ref == 'v0.5.0-expanded-gallery'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v0.5.0-expanded-gallery
+          fetch-depth: 0
+
+      - name: Extract embedded scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby -ryaml - <<'RUBY'
+          workflow = YAML.load_file('.github/workflows/build-v050.yml')
+          steps = workflow.fetch('jobs').fetch('build').fetch('steps')
+          scripts = steps.filter_map { |step| step['run'] }
+          abort "Expected four embedded scripts, found #{scripts.length}" unless scripts.length == 4
+          scripts.each_with_index do |script, index|
+            File.write("/tmp/v050-step-#{index}.sh", "set -euo pipefail\n#{script}\n")
+          end
+          RUBY
+
+      - name: Download and verify COD CIFs
+        run: bash /tmp/v050-step-0.sh
+
+      - name: Update gallery and metadata
+        run: bash /tmp/v050-step-1.sh
+
+      - name: Validate syntax, CIFs and browser startup
+        run: bash /tmp/v050-step-2.sh
+
+      - name: Commit generated v0.5.0 release
+        run: bash /tmp/v050-step-3.sh
+
+      - name: Remove temporary build hooks
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin v0.5.0-expanded-gallery
+          rm -f .github/workflows/staged-v050-pr.yml .v050-build-trigger
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Clean temporary v0.5.0 build hooks"
+          git push origin HEAD:v0.5.0-expanded-gallery
