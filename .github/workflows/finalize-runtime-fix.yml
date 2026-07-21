@@ -1,0 +1,56 @@
+name: Finalize runtime fix
+
+on:
+  push:
+    branches: [runtime-fix-v0.4.1]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[runtime-finalized]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: runtime-fix-v0.4.1
+      - name: Finalize runtime wiring
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace('style.css?v=0.4.0', 'style.css?v=0.4.1')
+          text = text.replace('style-v040.css?v=0.4.0', 'style-v040.css?v=0.4.1')
+          text = text.replace('src/camera-toggle.js?v=0.4.0', 'src/camera-toggle.js?v=0.4.1')
+          text = text.replace('src/provenance.js?v=0.4.0', 'src/provenance.js?v=0.4.1')
+          text = text.replace('src/app.js?v=0.4.0', 'src/app.js?v=0.4.1')
+          if 'style-v041.css?v=0.4.1' not in text:
+              text = text.replace('<link rel="stylesheet" href="style-v040.css?v=0.4.1" />', '<link rel="stylesheet" href="style-v040.css?v=0.4.1" />\n  <link rel="stylesheet" href="style-v041.css?v=0.4.1" />')
+          if 'src/runtime-watchdog.js?v=0.4.1' not in text:
+              text = text.replace('  <script src="src/camera-toggle.js?v=0.4.1"></script>', '  <script src="src/runtime-watchdog.js?v=0.4.1"></script>\n  <script src="src/camera-toggle.js?v=0.4.1"></script>')
+          p.write_text(text, encoding='utf-8')
+
+          p = Path('src/provenance.js')
+          text = p.read_text(encoding='utf-8').replace('const APP_VERSION = "v0.4.0";', 'const APP_VERSION = "v0.4.1";')
+          p.write_text(text, encoding='utf-8')
+
+          p = Path('CITATION.cff')
+          text = p.read_text(encoding='utf-8').replace('version: "0.4.0"', 'version: "0.4.1"')
+          p.write_text(text, encoding='utf-8')
+
+          p = Path('README.md')
+          text = p.read_text(encoding='utf-8').replace('`v0.4.0`', '`v0.4.1`')
+          p.write_text(text, encoding='utf-8')
+
+          Path('.github/workflows/finalize-runtime-fix.yml').unlink()
+          PY
+      - name: Commit finalized runtime
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: finalize v0.4.1 browser recovery [runtime-finalized]"
+          git push origin runtime-fix-v0.4.1
