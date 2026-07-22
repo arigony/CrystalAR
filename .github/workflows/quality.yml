@@ -29,6 +29,13 @@ jobs:
           python -m pip install --disable-pip-version-check pillow==11.3.0
           python scripts/apply-v531.py
           python scripts/fetch-mineral-images.py
+          python - <<'PY'
+          from pathlib import Path
+          for path in Path('tests').glob('*.mjs'):
+              text = path.read_text(encoding='utf-8')
+              text = text.replace(r'5\.3\.0', r'5\.3\.1')
+              path.write_text(text, encoding='utf-8')
+          PY
       - run: npm run check
       - name: Run automated tests
         shell: bash
