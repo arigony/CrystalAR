@@ -49,11 +49,18 @@ for (const [key, example] of Object.entries(SCIENCE_EXAMPLES)) {
   test(`${key} has a valid local derivative and provenance`, async () => {
     const text = await readFile(new URL(`../${example.path}`, import.meta.url), "utf8");
     assert.match(text, new RegExp(`_cod_database_code\\s+${example.codId}`));
-    assert.match(text, /_cod_original_sg_symbol_H-M/);
     const doc = parseCIFDocument(text), model = buildCrystalModel(doc, 1);
     assert.equal(model.metadata.codId, example.codId);
-    assert.equal(model.metadata.spaceGroup, "P 1");
     assert.ok(model.unitAtoms.length > 0);
+
+    if (example.family === "carbon") {
+      assert.match(text, /_space_group_name_H-M_alt/);
+      assert.notEqual(model.metadata.spaceGroup, "P 1");
+    } else {
+      assert.match(text, /_cod_original_sg_symbol_H-M/);
+      assert.equal(model.metadata.spaceGroup, "P 1");
+    }
+
     if (expectedCounts[key]) assert.equal(model.unitAtoms.length, expectedCounts[key]);
   });
 }
