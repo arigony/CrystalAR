@@ -1,5 +1,43 @@
 [
   {
+    "key": "diamond",
+    "filename": "diamond.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Diamond_crystal%2C_0%2C7_ct.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Diamond_crystal,_0,7_ct.jpg",
+    "author": "Tõnu Pani",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "description": "Cristal bruto e isolado de diamante, 0,7 ct, com faces naturais preservadas.",
+    "crop": "square-center",
+    "output": "assets/minerals/diamond.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "eb35668df92a90f19e884d78f6512cb05932140b133207367df71d07573fd49a",
+    "processed_sha256": "aa1f312b9574d1392e73ceaaac539bcfd5841725499d46605612ba506599efe6",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
+    "key": "graphite",
+    "filename": "graphite.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Graphite-233436.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Graphite-233436.jpg",
+    "author": "Rob Lavinsky, iRocks.com",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "description": "Massa natural de grafite cinza-aço com forma lamelar e aspecto foliado.",
+    "crop": "square-center",
+    "output": "assets/minerals/graphite.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "c0caa310c70f6f29a238886c2b83cb5ab46db76cf63952bd2722893a649fdaa4",
+    "processed_sha256": "f759b8f90b908284351d5c8ae3842f661f24c41b020e77a809765530fd9ec668",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
     "key": "rutile",
     "filename": "rutile.jpg",
     "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Rutile-ww7c.jpg",
