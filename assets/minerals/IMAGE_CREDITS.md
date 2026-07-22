@@ -15,7 +15,7 @@ As imagens desta pasta são fotografias ou micrografias reais obtidas de fontes 
 - Fotografia: **Tom Epaminondas e Eurico Zimbres**
 - Exemplar: cristais castanhos de anatásio, Gouveia, Minas Gerais, Brasil
 - Fonte: <https://commons.wikimedia.org/wiki/File:Anat%C3%A1sio.jpeg>
-- Licença: **CC BY-SA 2.0 Brasil**
+- Licença: **CC BY-SA 2.0 BR**
 - Alterações: recorte quadrado, redimensionamento e compressão JPEG
 
 ## Brookita — `brookite.jpg`
@@ -31,7 +31,7 @@ As imagens desta pasta são fotografias ou micrografias reais obtidas de fontes 
 - Fotografia: **Parent Géry**
 - Exemplar: romboedros de calcita
 - Fonte: <https://commons.wikimedia.org/wiki/File:Calcite_5.jpg>
-- Licença: **domínio público**
+- Licença: **Domínio público**
 - Alterações: recorte quadrado, redimensionamento e compressão JPEG
 
 ## Aragonita — `aragonite.jpg`
