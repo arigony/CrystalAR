@@ -2,20 +2,20 @@
   {
     "key": "diamond",
     "filename": "diamond.jpg",
-    "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Diamond-260146.jpg",
-    "source_page": "https://commons.wikimedia.org/wiki/File:Diamond-260146.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Diamond-diamond_macle1.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Diamond-diamond_macle1.jpg",
     "author": "Rob Lavinsky, iRocks.com",
     "license": "CC BY-SA 3.0",
     "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
-    "description": "Diamante natural transparente, branco e octaédrico arredondado, 0,06 ct, do Crater of Diamonds State Park, Arkansas, EUA.",
+    "description": "Diamante natural maclado (macle), triangular, transparente, 9,94 ct, 1,5 × 1,5 × 0,4 cm, África do Sul.",
     "crop": "square-center",
     "output": "assets/minerals/diamond.jpg",
     "output_size": [
       900,
       900
     ],
-    "source_sha256": "d485e1c0d39bc11798b0dea6e803ab3420d92d901dc446056d937c8006255baf",
-    "processed_sha256": "440bfe33f41b6f8e65c97cce5ba5632f3bc5cab8ffff107da2ea8b96f6baff2f",
+    "source_sha256": "b6c6aca6ec170b1f97a4746134f06c7d4fee44000db5830ab9ac132043738dd1",
+    "processed_sha256": "63425e9b260aae44bf04c9b9fac78e2bba84a95a37eec356019bf61c6dbdc218",
     "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
   },
   {

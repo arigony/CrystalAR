@@ -22,3 +22,8 @@ test("mouse hover and touch click both enlarge the mineral image", () => {
   assert.match(module, /aria-expanded/);
   assert.match(module, /event\.key === "Escape"/);
 });
+
+
+test('does not display the old "imagem real" label', () => {
+  assert.doesNotMatch(css, /content:\s*["']imagem real["']/i);
+});

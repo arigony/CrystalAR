@@ -19,18 +19,18 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "assets" / "minerals"
 SIZE = (900, 900)
-USER_AGENT = "CrystalAR/5.3.1 educational image sync (https://github.com/arigony/CrystalAR)"
+USER_AGENT = "CrystalAR/5.3.2 educational image sync (https://github.com/arigony/CrystalAR)"
 
 IMAGES = [
     {
         "key": "diamond",
         "filename": "diamond.jpg",
-        "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Diamond-260146.jpg",
-        "source_page": "https://commons.wikimedia.org/wiki/File:Diamond-260146.jpg",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Diamond-diamond_macle1.jpg",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Diamond-diamond_macle1.jpg",
         "author": "Rob Lavinsky, iRocks.com",
         "license": "CC BY-SA 3.0",
         "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
-        "description": "Diamante natural transparente, branco e octaédrico arredondado, 0,06 ct, do Crater of Diamonds State Park, Arkansas, EUA.",
+        "description": "Diamante natural maclado (macle), triangular, transparente, 9,94 ct, 1,5 × 1,5 × 0,4 cm, África do Sul.",
         "crop": "square-center",
     },
     {

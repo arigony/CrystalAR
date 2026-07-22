@@ -7,10 +7,10 @@ export const SCIENCE_EXAMPLES = {
     teachingNote: "Observe a geometria tetraédrica local e procure caminhos covalentes que se estendem nas três dimensões.",
     question: "Por que uma rede covalente 3D resiste melhor à deformação do que uma estrutura em camadas?",
     mineralImage: {
-      path: "assets/minerals/diamond.jpg", kind: "Fotografia de cristal real", title: "Diamante bruto — C",
-      alt: "Diamante natural transparente, branco e octaédrico arredondado, isolado sobre fundo neutro.",
-      caption: "Diamante natural de 0,06 ct do Crater of Diamonds State Park, Arkansas. A forma octaédrica arredondada é uma morfologia externa real, não uma fotografia da rede atômica.",
-      author: "Rob Lavinsky, iRocks.com", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Diamond-260146.jpg"
+      path: "assets/minerals/diamond.jpg", kind: "Fotografia de cristal", title: "Diamante maclado — C",
+      alt: "Diamante natural transparente com macla triangular do tipo macle, isolado sobre fundo preto.",
+      caption: "Diamante natural maclado (macle), de 9,94 ct, procedente da África do Sul. A forma triangular resulta da geminação cristalina e não representa diretamente a rede atômica.",
+      author: "Rob Lavinsky, iRocks.com", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Diamond-diamond_macle1.jpg"
     },
     representation: "ball-stick", supercell: 2, showBonds: true,
     bondRules: [{ elements: ["C", "C"], minDistance: 1.35, maxDistance: 1.65, kind: "covalent" }],
