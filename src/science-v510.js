@@ -2,7 +2,7 @@ import { parseCIFDocument } from "./cif-parser.js";
 import { buildCrystalModel } from "./crystal.js";
 import { LESSON_FAMILIES, SCIENCE_EXAMPLES } from "./science-presets.js";
 
-const VERSION = "v5.3.1";
+const VERSION = "v5.3.2";
 const INCORPORATED_ON = "22/07/2026";
 const $ = id => document.getElementById(id);
 const state = { key: "", text: "", filename: "", doc: null, model: null, measure: false, family: "carbon" };
@@ -13,7 +13,7 @@ function injectStyle() {
   if (document.querySelector('link[data-crystalar-v510]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "style-v510.css?v=5.3.1";
+  link.href = "style-v510.css?v=5.3.2";
   link.dataset.crystalarV510 = "true";
   document.head.appendChild(link);
 }
@@ -30,7 +30,7 @@ function cardsFor(family) {
 
 function injectInterface() {
   if (document.getElementById("scienceGallery510")) return;
-  document.title = "CrystalAR 5.3.1 — composição, estrutura e propriedade";
+  document.title = "CrystalAR 5.3.2 — composição, estrutura e propriedade";
   document.querySelector(".panel-heading .eyebrow").textContent = `Versão ${VERSION}`;
   const brandText = document.querySelector(".brand p");
   if (brandText) brandText.textContent = "21 estruturas · alótropos · minerais reais · polimorfismo · WebAR";
@@ -166,7 +166,7 @@ function renderMineralImage(example) {
   if (!image) return;
   closeMineralImageZoom();
   const element = $("mineralImage");
-  element.src = `${image.path}?v=5.3.1`;
+  element.src = `${image.path}?v=5.3.2`;
   element.alt = image.alt;
   $("mineralImageButton").setAttribute("aria-label", `Ampliar fotografia: ${image.title}`);
   $("mineralImageKind").textContent = image.kind;
@@ -432,7 +432,7 @@ function wireEvents() {
     ].filter(Boolean).join("\n");
     try {
       await navigator.clipboard.writeText(text);
-      toast("Proveniência 5.3.1 copiada.", "success");
+      toast("Proveniência 5.3.2 copiada.", "success");
     } catch {
       toast("Não foi possível copiar a proveniência.", "error");
     }

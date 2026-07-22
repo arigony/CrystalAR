@@ -37,15 +37,15 @@ assert.equal(exitCode, 0, `Chrome terminou com código ${exitCode}.\n${stderr}`)
 assert.match(dom, /CrystalAR/, "A página não contém a aplicação CrystalAR.");
 assert.doesNotMatch(dom, /Aguardando estrutura/, `A estrutura inicial não foi carregada.\nConsole do navegador:\n${stderr}`);
 assert.match(dom, /Diamante/, `O exemplo inicial não apareceu no DOM após a inicialização.\n${stderr}`);
-assert.match(dom, /Versão v5\.3\.1/, `A versão 5.3.1 não apareceu no DOM renderizado.\n${stderr}`);
+assert.match(dom, /Versão v5\.3\.2/, `A versão 5.3.2 não apareceu no DOM renderizado.\n${stderr}`);
 assert.match(dom, /id="scienceGallery510"/, `A galeria científica não foi injetada.\n${stderr}`);
 assert.match(dom, /Carbono: diamante e grafite/, `O roteiro do carbono não apareceu no DOM.\n${stderr}`);
 assert.match(dom, /Polimorfos do TiO₂/, `A família TiO₂ não apareceu no DOM.\n${stderr}`);
 assert.match(dom, /Polimorfos do CaCO₃/, `A família CaCO₃ não apareceu no DOM.\n${stderr}`);
 assert.match(dom, /id="mineralImageButton"[^>]*aria-expanded="false"/, `O botão acessível da imagem mineral não apareceu.\n${stderr}`);
 assert.match(dom, /id="mineralImage"/, `A imagem mineral não apareceu no roteiro.\n${stderr}`);
-assert.match(dom, /assets\/minerals\/diamond\.jpg\?v=5\.3\.1/, `A fotografia de diamante não foi sincronizada ao roteiro inicial.\n${stderr}`);
-assert.match(dom, /Diamante natural transparente, branco e octaédrico arredondado/i, `O texto alternativo da fotografia de diamante está ausente.\n${stderr}`);
+assert.match(dom, /assets\/minerals\/diamond\.jpg\?v=5\.3\.2/, `A fotografia de diamante não foi sincronizada ao roteiro inicial.\n${stderr}`);
+assert.match(dom, /Diamante natural transparente com macla triangular do tipo macle/i, `O texto alternativo da fotografia de diamante está ausente.\n${stderr}`);
 assert.match(dom, /Rob Lavinsky, iRocks.com/, `O crédito da imagem do diamante não apareceu.\n${stderr}`);
 assert.match(dom, /Estrutura → propriedade/, `A matriz de comparação não apareceu.\n${stderr}`);
 assert.match(dom, /tetraédrica · sp³/, `A comparação sp3 do diamante está ausente.\n${stderr}`);
@@ -55,4 +55,4 @@ assert.match(dom, /Ver fonte e licença/, `O link de licença da imagem não apa
 assert.match(dom, /Escalas diferentes/, `O aviso macro\/micro não apareceu.\n${stderr}`);
 assert.match(dom, /id="showPolyhedra"/, `O controle de poliedros não apareceu no DOM.\n${stderr}`);
 assert.match(dom, /id="measureMode"/, `O controle de medição não apareceu no DOM.\n${stderr}`);
-console.log("Browser smoke PASS: CrystalAR 5.3.1 e roteiro diamante-grafite carregados no navegador real.");
+console.log("Browser smoke PASS: CrystalAR 5.3.2 e roteiro diamante-grafite carregados no navegador real.");

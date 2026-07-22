@@ -51,7 +51,7 @@ test("science presets map one image to every scientific route example", () => {
 test("carbon images distinguish rough diamond and lamellar graphite", () => {
   const diamond = manifest.find(entry => entry.key === "diamond");
   const graphite = manifest.find(entry => entry.key === "graphite");
-  assert.match(diamond.description, /transparente.*octaédrico/i);
+  assert.match(diamond.description, /maclado.*triangular.*transparente/i);
   assert.match(graphite.description, /lamelar|foliado/i);
   assert.match(diamond.license, /CC BY-SA 3\.0/);
   assert.match(graphite.license, /CC BY-SA 3\.0/);

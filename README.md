@@ -4,11 +4,11 @@
 
 ## Versão
 
-`5.3.1` — **Composição, conectividade atômica e propriedades: diamante × grafite**.
+`5.3.2` — **Composição, conectividade atômica e propriedades: diamante × grafite**.
 
 A versão 5.3 mantém as **21 estruturas** e amplia a 5.2 com um roteiro introdutório sobre alotropia do carbono. Fotografias reais de diamante bruto e grafite lamelar são comparadas aos respectivos modelos cristalográficos, sem confundir aparência macroscópica com organização atômica.
 
-Na correção 5.3.1, as imagens minerais usam miniaturas compactas com ampliação por mouse ou toque, e a fotografia do diamante foi substituída por um exemplar transparente octaédrico arredondado com licença CC BY-SA 3.0.
+Na correção 5.3.2, o selo visual ‘imagem real’ foi removido e a fotografia do diamante foi substituída por um exemplar natural maclado, triangular e transparente, com licença CC BY-SA 3.0. As miniaturas compactas e a ampliação por mouse ou toque foram preservadas.
 
 ## Roteiros comparativos
 
