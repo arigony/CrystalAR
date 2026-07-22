@@ -1,0 +1,116 @@
+[
+  {
+    "key": "rutile",
+    "filename": "rutile.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Rutile-ww7c.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Rutile-ww7c.jpg",
+    "author": "Rob Lavinsky, iRocks.com",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "description": "Rutilo reticulado, com cristais estriados vermelho-escuros; Diamantina, Minas Gerais, Brasil.",
+    "crop": "square-center",
+    "output": "assets/minerals/rutile.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "57014ff66db3d2793d34a7ca0cf4721555da45a33c2d1f83efd973f2a87ab93d",
+    "processed_sha256": "bfb72236092efd2a858ddd6a392cd386ed661e05694a7d7ff24916cbb98f3008",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
+    "key": "anatase",
+    "filename": "anatase.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Anat%C3%A1sio.jpeg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Anat%C3%A1sio.jpeg",
+    "author": "Tom Epaminondas e Eurico Zimbres",
+    "license": "CC BY-SA 2.0 BR",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/br/",
+    "description": "Cristais castanhos de anatásio; Gouveia, Minas Gerais, Brasil.",
+    "crop": "square-center",
+    "output": "assets/minerals/anatase.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "a8fccf4ad6e7380450614ef53550db217a04caf57756e2b0f0e91581bec82100",
+    "processed_sha256": "127febd85a346d27e8120cb33c5c95b6e8b9711ec9fad667222a6b2ddd6a6adf",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
+    "key": "brookite",
+    "filename": "brookite.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Brookite.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Brookite.jpg",
+    "author": "Assianir",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "description": "Exemplar de brookita, com hábito tabular/lamelar visível.",
+    "crop": "square-center",
+    "output": "assets/minerals/brookite.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "958850de428463666a434be3fe4f4410d857dc9823133f90f0a31c752dd2fcd6",
+    "processed_sha256": "657b4762a05d2fc992c1f8bf8f40fa8ba991ff698c3f1a70ed954603e0c25f6f",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
+    "key": "calcite",
+    "filename": "calcite.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Calcite_5.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Calcite_5.jpg",
+    "author": "Parent Géry",
+    "license": "Domínio público",
+    "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "description": "Romboedros de calcita, escolhidos para evidenciar o hábito cristalino característico.",
+    "crop": "square-center",
+    "output": "assets/minerals/calcite.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "990e97c3545381a524f93acd72f4f2ae78ea5bb62adf0b5096f0e56c4a639427",
+    "processed_sha256": "68fdab3c541c5c42b9820ad8026722e267f355dd040a63fcbb1bb8be1a1caa0e",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
+    "key": "aragonite",
+    "filename": "aragonite.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Aragonite-23204.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Aragonite-23204.jpg",
+    "author": "Rob Lavinsky, iRocks.com",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "description": "Agregados radiais tridimensionais de aragonita; Nevada, EUA.",
+    "crop": "square-center",
+    "output": "assets/minerals/aragonite.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "ab44e8478e37b96d68ab43cbc155b709842fdff5a082ae4e602f78223bd321e5",
+    "processed_sha256": "5bdb6d7714d949379562c6e74121488019e1f20b3db3e7465ad0a587bb9e0516",
+    "modifications": "Recorte central, redimensionamento para 900 × 900 px e compressão JPEG."
+  },
+  {
+    "key": "vaterite",
+    "filename": "vaterite.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Vaterite_Spheres_SEM.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Vaterite_Spheres_SEM.jpg",
+    "author": "A. Di Falco",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/",
+    "description": "Micrografia eletrônica de esferas de vaterita; a imagem não representa uma amostra macroscópica.",
+    "crop": "SEM panel c, then square",
+    "output": "assets/minerals/vaterite.jpg",
+    "output_size": [
+      900,
+      900
+    ],
+    "source_sha256": "94fb8fecc7c4ac505ad664d17e500deb1a4bdb65887ed4f1b92ab132373b6a53",
+    "processed_sha256": "cd5583e19f4be4135fb1f9d786fe88d2acdf4e3d50e165e9c8fbcfa977cddf34",
+    "modifications": "Recorte do painel c da micrografia, recorte quadrado, redimensionamento para 900 × 900 px e compressão JPEG."
+  }
+]

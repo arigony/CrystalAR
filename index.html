@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="CrystalAR 5.1.1 — galeria educacional com 21 estruturas cristalográficas em 3D e realidade aumentada, comparação de polimorfos, coordenação, ocupação e proveniência." />
-  <title>CrystalAR 5.1.1 — Galeria cristalográfica 3D e AR</title>
-  <link rel="stylesheet" href="style.css?v=5.1.1" />
-  <link rel="stylesheet" href="style-v040.css?v=5.1.1" />
-  <link rel="stylesheet" href="style-v041.css?v=5.1.1" />
-  <link rel="stylesheet" href="style-v510.css?v=5.1.1" data-crystalar-v510="true" />
+  <meta name="description" content="CrystalAR 5.2.0 — galeria educacional com 21 estruturas cristalográficas, fotografias minerais reais licenciadas, comparação de polimorfos, coordenação, ocupação e WebAR." />
+  <title>CrystalAR 5.2.0 — Estruturas cristalinas e minerais reais</title>
+  <link rel="stylesheet" href="style.css?v=5.2.0" />
+  <link rel="stylesheet" href="style-v040.css?v=5.2.0" />
+  <link rel="stylesheet" href="style-v041.css?v=5.2.0" />
+  <link rel="stylesheet" href="style-v510.css?v=5.2.0" data-crystalar-v510="true" />
   <script type="importmap">
   {
     "imports": {
@@ -28,7 +28,7 @@
       <div class="brand-mark">C</div>
       <div>
         <h1>Crystal<span>AR</span></h1>
-        <p>21 estruturas · polimorfismo · coordenação · ocupação · proveniência · WebAR</p>
+        <p>21 estruturas · minerais reais · polimorfismo · coordenação · proveniência · WebAR</p>
       </div>
     </div>
     <div class="view-actions" aria-label="Modos de visualização">
@@ -41,7 +41,7 @@
   <aside class="control-panel" aria-label="Controles do CrystalAR">
     <div class="panel-heading">
       <div>
-        <span class="eyebrow">Versão v5.1.1</span>
+        <span class="eyebrow">Versão v5.2.0</span>
         <h2>Galeria cristalográfica</h2>
       </div>
       <button id="collapseControls" class="icon-button" type="button" aria-label="Recolher controles">−</button>
@@ -49,7 +49,7 @@
 
     <div id="controlBody" class="control-body">
       <p class="gallery-intro">
-        Vinte e uma estruturas para comparar redes, polimorfismo, coordenação, materiais porosos e ocupação cristalográfica. Dados experimentais e derivados educacionais são identificados separadamente.
+        Vinte e uma estruturas para comparar composição, rede cristalina, coordenação e aparência mineral. Fotografias e micrografias reais são identificadas e creditadas separadamente dos modelos atômicos.
       </p>
 
       <section class="example-group" aria-labelledby="carbonTitle">
@@ -240,7 +240,7 @@
           <div><span>COD ID</span><strong id="provCodId">—</strong></div>
           <div class="wide"><span>URI da fonte</span><strong id="provUri">—</strong></div>
           <div><span>Incorporação</span><strong id="provDate">—</strong></div>
-          <div><span>CrystalAR</span><strong id="provVersion">v5.1.1</strong></div>
+          <div><span>CrystalAR</span><strong id="provVersion">v5.2.0</strong></div>
           <div class="hash-item wide"><span>SHA-256 do texto CIF carregado</span><strong id="provHash">calculando…</strong></div>
         </div>
         <div class="provenance-actions">
@@ -249,7 +249,7 @@
         </div>
       </section>
 
-      <small class="source-note">Sólidos experimentais e derivados educacionais: COD IDs, referências, parâmetros de cela e grupos espaciais originais são preservados. Os polimorfos de TiO₂ e CaCO₃ são derivados P1 explicitamente identificados. MOF-5, HKUST-1 e ZIF-8 são modelos educacionais limpos. Grafeno é um modelo periódico 2D.</small>
+      <small class="source-note">Sólidos experimentais e derivados educacionais: COD IDs, referências, parâmetros de cela e grupos espaciais originais são preservados. Fotografias e micrografias minerais possuem autoria, licença, fonte e alterações registradas em <code>assets/minerals/IMAGE_CREDITS.md</code>. MOFs são modelos educacionais limpos; grafeno é um modelo periódico 2D.</small>
     </div>
   </section>
 
@@ -268,9 +268,9 @@
 
   <div id="toastBox" class="toast-box" aria-live="polite"></div>
 
-  <script src="src/runtime-watchdog.js?v=5.1.1"></script>
-  <script src="src/camera-toggle.js?v=5.1.1"></script>
-  <script src="src/provenance.js?v=5.1.1"></script>
-  <script type="module" src="src/app.js?v=5.1.1"></script>
+  <script src="src/runtime-watchdog.js?v=5.2.0"></script>
+  <script src="src/camera-toggle.js?v=5.2.0"></script>
+  <script src="src/provenance.js?v=5.2.0"></script>
+  <script type="module" src="src/app.js?v=5.2.0"></script>
 </body>
 </html>

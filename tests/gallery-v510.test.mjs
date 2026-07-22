@@ -9,28 +9,37 @@ const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const scienceModule = await readFile(new URL("../src/science-v510.js", import.meta.url), "utf8");
 const expectedCounts = { tio2Rutile: 6, tio2Anatase: 12, tio2Brookite: 24, caco3Calcite: 30, caco3Aragonite: 20 };
 
-test("package and scientific release are version 5.1.1", async () => {
+test("package and scientific release are version 5.2.0", async () => {
   const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
-  assert.equal(pkg.version, "5.1.1");
+  assert.equal(pkg.version, "5.2.0");
   const loader = await readFile(new URL("../src/runtime-watchdog.js", import.meta.url), "utf8");
-  assert.match(loader, /science-v510\.js\?v=5\.1\.1/);
-  assert.match(scienceModule, /const VERSION = "v5\.1\.1"/);
+  assert.match(loader, /science-v510\.js\?v=5\.2\.0/);
+  assert.match(scienceModule, /const VERSION = "v5\.2\.0"/);
 });
 
-test("HTML-base exposes 5.1.1 before JavaScript enhancement", () => {
-  assert.match(index, /Versão v5\.1\.1/);
-  assert.match(index, /Vinte e uma estruturas/);
-  assert.match(index, /style-v510\.css\?v=5\.1\.1/);
-  assert.match(index, /runtime-watchdog\.js\?v=5\.1\.1/);
-  assert.match(index, /provenance\.js\?v=5\.1\.1/);
-  assert.match(index, /app\.js\?v=5\.1\.1/);
-  assert.doesNotMatch(index, /\?v=5\.0\.0/);
+test("HTML-base exposes 5.2.0 before JavaScript enhancement", () => {
+  assert.match(index, /Versão v5\.2\.0/);
+  assert.match(index, /Fotografias e micrografias reais/);
+  assert.match(index, /style-v510\.css\?v=5\.2\.0/);
+  assert.match(index, /runtime-watchdog\.js\?v=5\.2\.0/);
+  assert.match(index, /provenance\.js\?v=5\.2\.0/);
+  assert.match(index, /app\.js\?v=5\.2\.0/);
+  assert.doesNotMatch(index, /\?v=5\.1\.1/);
 });
 
 test("two lesson families contain three polymorphs each", () => {
   assert.deepEqual(LESSON_FAMILIES.tio2.keys, ["tio2Rutile", "tio2Anatase", "tio2Brookite"]);
   assert.deepEqual(LESSON_FAMILIES.caco3.keys, ["caco3Calcite", "caco3Aragonite", "caco3Vaterite"]);
   assert.equal(Object.keys(SCIENCE_EXAMPLES).length, 6);
+});
+
+test("scientific module renders synchronized real-image evidence", () => {
+  assert.match(scienceModule, /id="mineralImage"/);
+  assert.match(scienceModule, /id="mineralImageCredit"/);
+  assert.match(scienceModule, /id="mineralImageSource"/);
+  assert.match(scienceModule, /Escalas diferentes/);
+  assert.match(scienceModule, /Cor e hábito também dependem de impurezas/);
+  assert.match(scienceModule, /renderMineralImage\(example\)/);
 });
 
 for (const [key, example] of Object.entries(SCIENCE_EXAMPLES)) {
@@ -61,7 +70,7 @@ test("explicit chemical rules avoid generic all-pair bonding", async () => {
   const model = buildCrystalModel(parseCIFDocument(text), 2);
   const bonds = inferBonds(model.atoms, 18000, example.bondRules);
   assert.ok(bonds.length > 0);
-  for (const [a,b] of bonds) {
+  for (const [a, b] of bonds) {
     const pair = [model.atoms[a].element, model.atoms[b].element].sort().join("-");
     assert.ok(["C-O", "Ca-O"].includes(pair));
   }
