@@ -5,9 +5,9 @@ import { SCIENCE_EXAMPLES } from "../src/science-presets.js";
 
 const manifest = JSON.parse(await readFile(new URL("../assets/minerals/manifest.json", import.meta.url), "utf8"));
 const credits = await readFile(new URL("../assets/minerals/IMAGE_CREDITS.md", import.meta.url), "utf8");
-const expectedKeys = ["rutile", "anatase", "brookite", "calcite", "aragonite", "vaterite"];
+const expectedKeys = ["diamond", "graphite", "rutile", "anatase", "brookite", "calcite", "aragonite", "vaterite"];
 
-test("manifest records six licensed and processed mineral images", () => {
+test("manifest records eight licensed and processed scientific images", () => {
   assert.deepEqual(manifest.map(entry => entry.key), expectedKeys);
   for (const entry of manifest) {
     assert.deepEqual(entry.output_size, [900, 900]);
@@ -42,10 +42,19 @@ test("credits document every image and separates image licenses from MIT code", 
   assert.match(credits, /Cor e hábito podem variar/i);
 });
 
-test("science presets map one image to every polymorph", () => {
+test("science presets map one image to every scientific route example", () => {
   const paths = Object.values(SCIENCE_EXAMPLES).map(example => example.mineralImage.path);
   assert.deepEqual(paths, expectedKeys.map(key => `assets/minerals/${key}.jpg`));
-  assert.equal(new Set(paths).size, 6);
+  assert.equal(new Set(paths).size, 8);
+});
+
+test("carbon images distinguish rough diamond and lamellar graphite", () => {
+  const diamond = manifest.find(entry => entry.key === "diamond");
+  const graphite = manifest.find(entry => entry.key === "graphite");
+  assert.match(diamond.description, /bruto e isolado/i);
+  assert.match(graphite.description, /lamelar|foliado/i);
+  assert.match(diamond.license, /CC BY 4\.0/);
+  assert.match(graphite.license, /CC BY-SA 3\.0/);
 });
 
 test("vaterite manifest preserves the SEM evidence type and panel crop", () => {
