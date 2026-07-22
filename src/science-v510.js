@@ -2,16 +2,18 @@ import { parseCIFDocument } from "./cif-parser.js";
 import { buildCrystalModel } from "./crystal.js";
 import { LESSON_FAMILIES, SCIENCE_EXAMPLES } from "./science-presets.js";
 
-const VERSION = "v5.2.0";
+const VERSION = "v5.3.0";
 const INCORPORATED_ON = "21/07/2026";
 const $ = id => document.getElementById(id);
-const state = { key: "", text: "", filename: "", doc: null, model: null, measure: false, family: "tio2" };
+const state = { key: "", text: "", filename: "", doc: null, model: null, measure: false, family: "carbon" };
+const BASE_SCIENCE_MAP = { diamond: "carbonDiamond", graphite: "carbonGraphite" };
+const SCIENCE_BASE_MAP = { carbonDiamond: "diamond", carbonGraphite: "graphite" };
 
 function injectStyle() {
   if (document.querySelector('link[data-crystalar-v510]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "style-v510.css?v=5.2.0";
+  link.href = "style-v510.css?v=5.3.0";
   link.dataset.crystalarV510 = "true";
   document.head.appendChild(link);
 }
@@ -28,12 +30,12 @@ function cardsFor(family) {
 
 function injectInterface() {
   if (document.getElementById("scienceGallery510")) return;
-  document.title = "CrystalAR 5.2.0 — estrutura cristalina e aparência mineral";
+  document.title = "CrystalAR 5.3.0 — composição, estrutura e propriedade";
   document.querySelector(".panel-heading .eyebrow").textContent = `Versão ${VERSION}`;
   const brandText = document.querySelector(".brand p");
-  if (brandText) brandText.textContent = "21 estruturas · minerais reais · polimorfismo · coordenação · WebAR";
+  if (brandText) brandText.textContent = "21 estruturas · alótropos · minerais reais · polimorfismo · WebAR";
   const intro = document.querySelector(".gallery-intro");
-  if (intro) intro.textContent = "Vinte e uma estruturas para comparar composição, rede cristalina, coordenação e aparência mineral. Fotografias e micrografias reais são identificadas e creditadas separadamente dos modelos atômicos.";
+  if (intro) intro.textContent = "Vinte e uma estruturas para relacionar composição, conectividade atômica, propriedades e aparência observável. O novo roteiro diamante × grafite introduz alotropia, sp³/sp² e dimensionalidade da rede.";
   $("provVersion").textContent = VERSION;
 
   const divider = document.querySelector(".control-body > .divider");
@@ -52,6 +54,7 @@ function injectInterface() {
       <div class="lesson-heading"><span class="eyebrow">Roteiro comparativo</span><h3 id="scienceLessonTitle">Investigue antes de concluir</h3></div>
       <label>Família estrutural
         <select id="scienceFamily">
+          <option value="carbon">Carbono: diamante e grafite</option>
           <option value="tio2">TiO₂: rutilo, anatásio e brookita</option>
           <option value="caco3">CaCO₃: calcita, aragonita e vaterita</option>
         </select>
@@ -68,8 +71,10 @@ function injectInterface() {
           <a id="mineralImageSource" href="#" target="_blank" rel="noopener noreferrer">Ver fonte e licença</a>
         </figcaption>
       </figure>
-      <p class="macro-micro-note"><strong>Escalas diferentes:</strong> a imagem mostra a aparência macro ou microscópica observada; o visualizador 3D mostra a organização atômica periódica. Cor e hábito também dependem de impurezas, geminação e condições de crescimento.</p>
+      <p class="macro-micro-note"><strong>Escalas diferentes:</strong> a fotografia mostra a aparência da amostra; o visualizador 3D mostra a organização atômica periódica. Hábito, cor e brilho também dependem de crescimento, defeitos e impurezas.</p>
       <div id="lessonPrompt" class="lesson-prompt"></div>
+      <div id="lessonComparison" class="lesson-comparison hidden"></div>
+      <div id="lessonQuestions" class="lesson-questions hidden"></div>
       <div id="lessonSteps" class="lesson-steps"></div>
       <div class="lesson-nav"><button id="lessonPrev" class="secondary" type="button">Estrutura anterior</button><button id="lessonNext" class="primary" type="button">Próxima estrutura</button></div>
     </section>`;
@@ -136,7 +141,7 @@ function renderMineralImage(example) {
   const image = example.mineralImage;
   if (!image) return;
   const element = $("mineralImage");
-  element.src = `${image.path}?v=5.2.0`;
+  element.src = `${image.path}?v=5.3.0`;
   element.alt = image.alt;
   $("mineralImageKind").textContent = image.kind;
   $("mineralImageTitle").textContent = image.title;
@@ -149,18 +154,23 @@ function renderInfo(example, model, counts) {
   $("structureName").textContent = example.label;
   $("structureFormula").textContent = model.metadata.formula;
   $("structureMeta").textContent = `galeria científica · ${counts.atomCount} átomos · ${counts.bondCount} contatos explícitos · ${counts.polyhedronCount || 0} poliedros`;
-  $("infoGrid").replaceChildren(
-    item("Classificação", "Derivado educacional P1 de determinação experimental COD", true),
+  const entries = [
+    item("Classificação", "Derivado educacional de determinação experimental COD", true),
     item("COD ID", example.codId),
     item("Grupo espacial original", example.originalSpaceGroup, true),
     item("Sistema cristalino", example.crystalSystem),
-    item("Coordenação", example.coordination, true),
+    item("Coordenação", example.coordination, true)
+  ];
+  if (example.hybridization) entries.push(item("Hibridização", example.hybridization), item("Dimensionalidade", example.dimensionality, true));
+  if (example.propertySummary) entries.push(item("Estrutura → propriedade", example.propertySummary, true));
+  entries.push(
     item("Parâmetros", formatCell(model.cell), true),
     item("Ângulos", formatAngles(model.cell), true),
     item("Z original", model.metadata.z),
     item("Átomos na cela expandida", String(model.unitAtoms.length)),
     item("Ocupação mínima", Math.min(...model.unitAtoms.map(atom => atom.occupancy)).toFixed(3))
   );
+  $("infoGrid").replaceChildren(...entries);
   const box = $("citationBox");
   box.textContent = `Nota didática: ${example.teachingNote} Pergunta de investigação: ${example.question}${example.scientificWarning ? ` ALERTA CIENTÍFICO: ${example.scientificWarning}` : ""}`;
   box.classList.remove("hidden");
@@ -168,7 +178,7 @@ function renderInfo(example, model, counts) {
 }
 
 function updateProvenance(example, text) {
-  $("provType").textContent = "Derivado educacional P1 de determinação experimental COD";
+  $("provType").textContent = "Derivado educacional de determinação experimental COD";
   $("provCodId").textContent = example.codId;
   $("provUri").textContent = `https://www.crystallography.net/cod/${example.codId}.cif`;
   $("provDate").textContent = INCORPORATED_ON;
@@ -206,8 +216,9 @@ async function loadScienceExample(key) {
   if (!example) return;
   state.key = key;
   state.family = example.family;
+  const baseKey = SCIENCE_BASE_MAP[key] || "";
   document.querySelectorAll("[data-example],[data-science-example]").forEach(button => {
-    const active = button.dataset.scienceExample === key;
+    const active = button.dataset.scienceExample === key || (baseKey && button.dataset.example === baseKey);
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", active ? "true" : "false");
   });
@@ -235,7 +246,7 @@ async function loadScienceExample(key) {
     $("scienceFamily").value = example.family;
     renderLesson(example.family, key);
     $("downloadCif").disabled = false;
-    setStatus(`${example.label}: compare a imagem real com a estrutura atômica sem confundir escalas.`, "success");
+    setStatus(`${example.label}: relacione conectividade atômica, dimensionalidade e propriedade observada.`, "success");
     toast(`${example.label} carregado no roteiro científico.`, "success");
   } catch (error) {
     state.key = "";
@@ -245,12 +256,36 @@ async function loadScienceExample(key) {
   }
 }
 
+function renderComparison(lesson) {
+  const comparison = $("lessonComparison");
+  const questions = $("lessonQuestions");
+  if (lesson.comparison?.length) {
+    const [firstKey, secondKey] = lesson.keys;
+    comparison.innerHTML = `
+      <div class="comparison-heading"><span class="eyebrow">Estrutura → propriedade</span><strong>Compare antes de responder</strong></div>
+      <div class="comparison-scroll"><table><thead><tr><th>Critério</th><th>${SCIENCE_EXAMPLES[firstKey].shortLabel}</th><th>${SCIENCE_EXAMPLES[secondKey].shortLabel}</th></tr></thead>
+      <tbody>${lesson.comparison.map(row => `<tr><th>${row[0]}</th><td>${row[1]}</td><td>${row[2]}</td></tr>`).join("")}</tbody></table></div>`;
+    comparison.classList.remove("hidden");
+  } else {
+    comparison.replaceChildren();
+    comparison.classList.add("hidden");
+  }
+  if (lesson.questions?.length) {
+    questions.innerHTML = `<strong>Perguntas de investigação</strong><ol>${lesson.questions.map(question => `<li>${question}</li>`).join("")}</ol>`;
+    questions.classList.remove("hidden");
+  } else {
+    questions.replaceChildren();
+    questions.classList.add("hidden");
+  }
+}
+
 function renderLesson(family, activeKey = "") {
   const lesson = LESSON_FAMILIES[family];
   if (!lesson) return;
   const current = activeKey || lesson.keys[0];
   const example = SCIENCE_EXAMPLES[current];
   renderMineralImage(example);
+  renderComparison(lesson);
   $("lessonPrompt").innerHTML = `<strong>${lesson.guidingQuestion}</strong><span>${lesson.synthesis}</span>`;
   $("lessonSteps").innerHTML = lesson.keys.map((key, index) => {
     const entry = SCIENCE_EXAMPLES[key];
@@ -276,7 +311,14 @@ function deactivateScience() {
 
 function wireEvents() {
   document.querySelectorAll("[data-science-example]").forEach(button => button.addEventListener("click", () => loadScienceExample(button.dataset.scienceExample)));
-  document.querySelectorAll("[data-example]").forEach(button => button.addEventListener("click", () => {
+  document.querySelectorAll("[data-example]").forEach(button => button.addEventListener("click", event => {
+    const mapped = BASE_SCIENCE_MAP[button.dataset.example];
+    if (mapped) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      loadScienceExample(mapped);
+      return;
+    }
     deactivateScience();
     requestAnimationFrame(() => { $("provVersion").textContent = VERSION; });
   }, { capture: true }));
@@ -348,7 +390,7 @@ function wireEvents() {
     ].filter(Boolean).join("\n");
     try {
       await navigator.clipboard.writeText(text);
-      toast("Proveniência 5.2.0 copiada.", "success");
+      toast("Proveniência 5.3.0 copiada.", "success");
     } catch {
       toast("Não foi possível copiar a proveniência.", "error");
     }
@@ -361,4 +403,5 @@ function wireEvents() {
 injectStyle();
 injectInterface();
 wireEvents();
-renderLesson("tio2");
+renderLesson("carbon");
+loadScienceExample("carbonDiamond");

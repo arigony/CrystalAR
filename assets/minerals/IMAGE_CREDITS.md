@@ -1,6 +1,24 @@
-# Créditos das imagens minerais — CrystalAR 5.2.0
+# Créditos das imagens minerais — CrystalAR 5.3.0
 
 As imagens desta pasta são fotografias ou micrografias reais obtidas de fontes com licença de reutilização. Elas foram recortadas e redimensionadas para os cartões educacionais da CrystalAR. Os arquivos originais, autores, licenças e hashes estão registrados em `manifest.json`.
+
+## Diamante — `diamond.jpg`
+
+- Fotografia: **Tõnu Pani**
+- Exemplar: cristal bruto e isolado de diamante, `0,7 ct`, sem lapidação
+- Fonte: <https://commons.wikimedia.org/wiki/File:Diamond_crystal,_0,7_ct.jpg>
+- Licença: **CC BY 4.0**
+- Alterações: recorte quadrado, redimensionamento e compressão JPEG
+- Nota didática: a fotografia mostra a forma externa de um cristal real; o modelo 3D apresenta a rede covalente periódica
+
+## Grafite — `graphite.jpg`
+
+- Fotografia: **Rob Lavinsky, iRocks.com**
+- Exemplar: massa natural cinza-aço com forma lamelar e aspecto foliado
+- Fonte: <https://commons.wikimedia.org/wiki/File:Graphite-233436.jpg>
+- Licença: **CC BY-SA 3.0**
+- Alterações: recorte quadrado, redimensionamento e compressão JPEG
+- Nota didática: o aspecto foliado é usado para introduzir camadas, clivagem e deslizamento, sem afirmar que o hábito externo é uma imagem direta das folhas atômicas
 
 ## Rutilo — `rutile.jpg`
 

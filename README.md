@@ -4,11 +4,26 @@
 
 ## Versão
 
-`5.2.0` — **Estrutura cristalina, aparência mineral e proveniência visual**.
+`5.3.0` — **Composição, conectividade atômica e propriedades: diamante × grafite**.
 
-A versão 5.2 mantém as **21 estruturas** da versão 5.1 e incorpora fotografias ou micrografias reais e licenciadas aos roteiros de TiO₂ e CaCO₃. A imagem muda junto com o polimorfo selecionado e é apresentada separadamente do modelo atômico 3D.
+A versão 5.3 mantém as **21 estruturas** e amplia a 5.2 com um roteiro introdutório sobre alotropia do carbono. Fotografias reais de diamante bruto e grafite lamelar são comparadas aos respectivos modelos cristalográficos, sem confundir aparência macroscópica com organização atômica.
 
 ## Roteiros comparativos
+
+### Carbono: diamante × grafite
+
+- diamante — COD `9012293`, Fd-3m;
+- grafite 2H — COD `1200017`, P6₃/mmc.
+
+O roteiro compara:
+
+- mesma composição química: `C`;
+- coordenação `4` versus `3`;
+- geometria tetraédrica/sp³ versus trigonal planar/sp²;
+- rede covalente tridimensional versus folhas bidimensionais empilhadas;
+- dureza e isolamento elétrico versus maciez e condução anisotrópica.
+
+Uma matriz comparativa e perguntas de investigação conduzem a relação **estrutura → propriedade**. Os cartões originais de diamante e grafite abrem diretamente o roteiro científico.
 
 ### TiO₂
 
@@ -28,7 +43,7 @@ O aplicativo distingue ligações C–O de contatos Ca–O. Na vaterita, posiç�
 
 ## Fotografias e micrografias minerais
 
-As seis imagens estão em `assets/minerals/` e possuem:
+As oito imagens estão em `assets/minerals/` e possuem:
 
 - autoria e licença explícitas;
 - link para a página original;
@@ -47,13 +62,15 @@ A interface diferencia **fotografia de exemplar real**, **micrografia eletrônic
 
 ## Integridade cristalográfica
 
-Os seis CIFs científicos são derivados educacionais expandidos em P1. COD ID, autores, parâmetros da cela e grupo espacial original permanecem registrados. Os arquivos locais não são apresentados como CIFs experimentais intactos.
+Os oito exemplos dos roteiros científicos são derivados educacionais de determinações experimentais do COD. COD ID, parâmetros da cela e grupo espacial original permanecem registrados. Os arquivos locais não são apresentados como CIFs experimentais intactos.
 
 ## Funcionalidades
 
 - 21 estruturas em sete famílias;
-- roteiro guiado com imagem mineral sincronizada;
-- regras específicas para Ti–O, C–O e Ca–O;
+- três roteiros guiados: carbono, TiO₂ e CaCO₃;
+- matriz estrutura–propriedade para diamante × grafite;
+- imagens reais sincronizadas às estruturas;
+- regras explícitas C–C, Ti–O, C–O e Ca–O;
 - poliedros de coordenação opcionais;
 - medição de distâncias e ângulos;
 - representação de ocupações parciais;
@@ -70,11 +87,12 @@ npm test
 npm run smoke:browser
 ```
 
-Os testes verificam os CIFs, ocupação parcial, regras químicas, versão exibida, seis registros de imagem, arquivos JPEG, créditos, licenças, integração do roteiro e inicialização no Chrome.
+Os testes verificam os CIFs, ocupação parcial, regras químicas, versão exibida, oito registros de imagem, arquivos JPEG, créditos, licenças, matriz diamante–grafite, integração dos roteiros e inicialização no Chrome.
 
 ## Limitações
 
 - uma fotografia mostra um exemplar específico e não todos os hábitos possíveis de um mineral;
+- propriedades são apresentadas em nível educacional e podem ser anisotrópicas ou depender de defeitos;
 - não se deve comparar diretamente o tamanho da micrografia de vaterita com as amostras macroscópicas;
 - estruturas antigas ainda podem usar inferência geométrica genérica;
 - poliedros nas fronteiras podem exigir supercela `2 × 2 × 2`;
