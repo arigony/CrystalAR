@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "v5.3.0";
+  const APP_VERSION = "v5.3.1";
   const INCORPORATED_ON = "21/07/2026";
   const COD_BASE = "https://www.crystallography.net/cod/";
 

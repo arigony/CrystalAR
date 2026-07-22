@@ -15,46 +15,120 @@
 .mineral-figure {
   margin: 0;
   display: grid;
-  grid-template-columns: minmax(130px, 0.82fr) minmax(0, 1.25fr);
-  gap: 14px;
-  align-items: stretch;
-  padding: 12px;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px;
   border: 1px solid rgba(29, 109, 120, 0.22);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.84);
   box-shadow: 0 8px 22px rgba(28, 62, 68, 0.08);
+  position: relative;
+  overflow: visible;
 }
 
 .mineral-image-frame {
+  appearance: none;
+  -webkit-appearance: none;
   position: relative;
-  min-height: 160px;
+  width: 104px;
+  height: 104px;
+  min-height: 0;
+  padding: 0;
   overflow: hidden;
+  border: 1px solid rgba(29, 109, 120, 0.18);
   border-radius: 11px;
-  background: #dfe7e8;
+  background: #eef2f2;
+  cursor: zoom-in;
+  isolation: isolate;
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .mineral-image-frame::after {
   content: "imagem real";
   position: absolute;
-  left: 8px;
-  bottom: 8px;
-  padding: 4px 7px;
+  left: 6px;
+  bottom: 6px;
+  padding: 3px 6px;
   border-radius: 999px;
   background: rgba(12, 31, 35, 0.78);
   color: #fff;
-  font-size: 0.64rem;
+  font-size: 0.56rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  pointer-events: none;
 }
 
 .mineral-image-frame img {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 160px;
+  min-height: 0;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff;
+}
+
+.mineral-zoom-hint {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #155f69;
+  box-shadow: 0 2px 8px rgba(12, 31, 35, 0.2);
+  font-size: 1rem;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mineral-image-frame:hover {
+    z-index: 40;
+    transform: scale(2.05);
+    transform-origin: left center;
+    box-shadow: 0 16px 38px rgba(12, 31, 35, 0.32);
+  }
+}
+
+.mineral-image-open { overflow: hidden; }
+
+.mineral-figure.image-expanded::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(7, 20, 24, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.mineral-figure.image-expanded .mineral-image-frame {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+  width: min(86vw, 520px);
+  height: min(86vw, 520px);
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  border: 4px solid #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+  cursor: zoom-out;
+}
+
+.mineral-figure.image-expanded .mineral-image-frame:hover {
+  transform: translate(-50%, -50%);
+}
+
+.mineral-figure.image-expanded .mineral-image-frame::after {
+  left: 10px;
+  bottom: 10px;
+  font-size: 0.7rem;
 }
 
 .mineral-image-copy {
@@ -194,10 +268,16 @@
 
 @media (max-width: 620px) {
   .science-lesson { padding: 12px; }
-  .mineral-figure { grid-template-columns: 1fr; }
-  .mineral-image-frame,
-  .mineral-image-frame img { min-height: 210px; }
+  .mineral-figure { grid-template-columns: 84px minmax(0, 1fr); gap: 10px; }
+  .mineral-image-frame { width: 84px; height: 84px; }
+  .mineral-image-copy h4 { font-size: 1rem; }
+  .mineral-image-copy p { font-size: 0.82rem; }
   .lesson-steps { grid-template-columns: 1fr; }
   .lesson-nav { grid-template-columns: 1fr; }
   .science-controls { position: relative; }
+}
+
+@media (max-width: 380px) {
+  .mineral-figure { grid-template-columns: 74px minmax(0, 1fr); }
+  .mineral-image-frame { width: 74px; height: 74px; }
 }
