@@ -1,15 +1,15 @@
-# Créditos das imagens minerais — CrystalAR 5.3.0
+# Créditos das imagens minerais — CrystalAR 5.3.1
 
 As imagens desta pasta são fotografias ou micrografias reais obtidas de fontes com licença de reutilização. Elas foram recortadas e redimensionadas para os cartões educacionais da CrystalAR. Os arquivos originais, autores, licenças e hashes estão registrados em `manifest.json`.
 
 ## Diamante — `diamond.jpg`
 
-- Fotografia: **Tõnu Pani**
-- Exemplar: cristal bruto e isolado de diamante, `0,7 ct`, sem lapidação
-- Fonte: <https://commons.wikimedia.org/wiki/File:Diamond_crystal,_0,7_ct.jpg>
-- Licença: **CC BY 4.0**
+- Fotografia: **Rob Lavinsky, iRocks.com**
+- Exemplar: diamante natural transparente, branco e octaédrico arredondado, `0,06 ct`, do Crater of Diamonds State Park, Arkansas, EUA
+- Fonte: <https://commons.wikimedia.org/wiki/File:Diamond-260146.jpg>
+- Licença: **CC BY-SA 3.0**
 - Alterações: recorte quadrado, redimensionamento e compressão JPEG
-- Nota didática: a fotografia mostra a forma externa de um cristal real; o modelo 3D apresenta a rede covalente periódica
+- Nota didática: a fotografia mostra uma morfologia externa real; o modelo 3D apresenta a rede covalente periódica
 
 ## Grafite — `graphite.jpg`
 

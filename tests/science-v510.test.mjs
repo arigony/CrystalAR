@@ -7,11 +7,11 @@ import { SCIENCE_EXAMPLES, LESSON_FAMILIES } from "../src/science-presets.js";
 
 const expectedCounts = { tio2Rutile: 6, tio2Anatase: 12, tio2Brookite: 24, caco3Calcite: 30, caco3Aragonite: 20 };
 
-test("package and scientific release are version 5.3.0", async () => {
+test("package and scientific release are version 5.3.1", async () => {
   const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
-  assert.equal(pkg.version, "5.3.0");
+  assert.equal(pkg.version, "5.3.1");
   const loader = await readFile(new URL("../src/runtime-watchdog.js", import.meta.url), "utf8");
-  assert.match(loader, /science-v510\.js\?v=5\.3\.0/);
+  assert.match(loader, /science-v510\.js\?v=5\.3\.1/);
 });
 
 test("three lesson families include carbon, TiO2 and CaCO3", () => {

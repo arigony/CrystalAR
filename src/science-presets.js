@@ -8,9 +8,9 @@ export const SCIENCE_EXAMPLES = {
     question: "Por que uma rede covalente 3D resiste melhor à deformação do que uma estrutura em camadas?",
     mineralImage: {
       path: "assets/minerals/diamond.jpg", kind: "Fotografia de cristal real", title: "Diamante bruto — C",
-      alt: "Cristal bruto e isolado de diamante, sem lapidação e sem outro mineral dominando a imagem.",
-      caption: "Cristal bruto de diamante de 0,7 ct. As faces externas resultam do crescimento cristalino; não são uma fotografia da rede atômica.",
-      author: "Tõnu Pani", license: "CC BY 4.0", source: "https://commons.wikimedia.org/wiki/File:Diamond_crystal,_0,7_ct.jpg"
+      alt: "Diamante natural transparente, branco e octaédrico arredondado, isolado sobre fundo neutro.",
+      caption: "Diamante natural de 0,06 ct do Crater of Diamonds State Park, Arkansas. A forma octaédrica arredondada é uma morfologia externa real, não uma fotografia da rede atômica.",
+      author: "Rob Lavinsky, iRocks.com", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Diamond-260146.jpg"
     },
     representation: "ball-stick", supercell: 2, showBonds: true,
     bondRules: [{ elements: ["C", "C"], minDistance: 1.35, maxDistance: 1.65, kind: "covalent" }],

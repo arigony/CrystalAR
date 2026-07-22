@@ -7,35 +7,17 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Apply pending 5.3.1 source migration
-        if: hashFiles('scripts/apply-v531.py') != ''
-        run: |
-          python -m pip install --disable-pip-version-check pillow==11.3.0
-          python scripts/apply-v531.py
-          python scripts/fetch-mineral-images.py
-          python - <<'PY'
-          from pathlib import Path
-          for path in Path('tests').glob('*.mjs'):
-              text = path.read_text(encoding='utf-8')
-              text = text.replace(r'5\.3\.0', r'5\.3\.1')
-              path.write_text(text, encoding='utf-8')
-          PY
+          node-version: 22
       - run: npm run check
       - name: Run automated tests
         shell: bash
@@ -51,19 +33,6 @@ jobs:
           if-no-files-found: ignore
       - name: Verify real browser startup
         run: npm run smoke:browser
-      - name: Commit validated 5.3.1 release
-        if: success() && hashFiles('scripts/apply-v531.py') != ''
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git fetch origin main
-          git checkout origin/main -- .github/workflows/quality.yml
-          rm -f scripts/apply-v531.py .github/workflows/apply-v531.yml
-          git add -A
-          git commit -m 'CrystalAR 5.3.1 — compact mineral images and accessible zoom'
-          git push origin HEAD:${GITHUB_HEAD_REF}
       - name: Verify published GitHub Pages version
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash

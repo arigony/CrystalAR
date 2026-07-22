@@ -2,8 +2,8 @@ import { parseCIFDocument } from "./cif-parser.js";
 import { buildCrystalModel } from "./crystal.js";
 import { LESSON_FAMILIES, SCIENCE_EXAMPLES } from "./science-presets.js";
 
-const VERSION = "v5.3.0";
-const INCORPORATED_ON = "21/07/2026";
+const VERSION = "v5.3.1";
+const INCORPORATED_ON = "22/07/2026";
 const $ = id => document.getElementById(id);
 const state = { key: "", text: "", filename: "", doc: null, model: null, measure: false, family: "carbon" };
 const BASE_SCIENCE_MAP = { diamond: "carbonDiamond", graphite: "carbonGraphite" };
@@ -13,7 +13,7 @@ function injectStyle() {
   if (document.querySelector('link[data-crystalar-v510]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "style-v510.css?v=5.3.0";
+  link.href = "style-v510.css?v=5.3.1";
   link.dataset.crystalarV510 = "true";
   document.head.appendChild(link);
 }
@@ -30,7 +30,7 @@ function cardsFor(family) {
 
 function injectInterface() {
   if (document.getElementById("scienceGallery510")) return;
-  document.title = "CrystalAR 5.3.0 — composição, estrutura e propriedade";
+  document.title = "CrystalAR 5.3.1 — composição, estrutura e propriedade";
   document.querySelector(".panel-heading .eyebrow").textContent = `Versão ${VERSION}`;
   const brandText = document.querySelector(".brand p");
   if (brandText) brandText.textContent = "21 estruturas · alótropos · minerais reais · polimorfismo · WebAR";
@@ -60,9 +60,10 @@ function injectInterface() {
         </select>
       </label>
       <figure id="mineralFigure" class="mineral-figure">
-        <div class="mineral-image-frame">
+        <button id="mineralImageButton" class="mineral-image-frame" type="button" aria-expanded="false" aria-label="Ampliar fotografia do mineral">
           <img id="mineralImage" src="" alt="" loading="lazy" decoding="async" />
-        </div>
+          <span class="mineral-zoom-hint" aria-hidden="true">⌕</span>
+        </button>
         <figcaption class="mineral-image-copy">
           <span id="mineralImageKind" class="eyebrow"></span>
           <h4 id="mineralImageTitle"></h4>
@@ -137,12 +138,37 @@ async function sha256(text) {
   return [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, "0")).join("");
 }
 
+function closeMineralImageZoom() {
+  const figure = $("mineralFigure");
+  const button = $("mineralImageButton");
+  if (!figure || !button) return;
+  figure.classList.remove("image-expanded");
+  button.setAttribute("aria-expanded", "false");
+  button.setAttribute("aria-label", `Ampliar fotografia: ${$("mineralImageTitle")?.textContent || "mineral"}`);
+  document.body.classList.remove("mineral-image-open");
+}
+
+function toggleMineralImageZoom() {
+  const figure = $("mineralFigure");
+  const button = $("mineralImageButton");
+  if (!figure || !button) return;
+  const expanded = !figure.classList.contains("image-expanded");
+  figure.classList.toggle("image-expanded", expanded);
+  button.setAttribute("aria-expanded", String(expanded));
+  button.setAttribute("aria-label", expanded
+    ? "Fechar fotografia ampliada"
+    : `Ampliar fotografia: ${$("mineralImageTitle")?.textContent || "mineral"}`);
+  document.body.classList.toggle("mineral-image-open", expanded);
+}
+
 function renderMineralImage(example) {
   const image = example.mineralImage;
   if (!image) return;
+  closeMineralImageZoom();
   const element = $("mineralImage");
-  element.src = `${image.path}?v=5.3.0`;
+  element.src = `${image.path}?v=5.3.1`;
   element.alt = image.alt;
+  $("mineralImageButton").setAttribute("aria-label", `Ampliar fotografia: ${image.title}`);
   $("mineralImageKind").textContent = image.kind;
   $("mineralImageTitle").textContent = image.title;
   $("mineralImageCaption").textContent = image.caption;
@@ -340,6 +366,22 @@ function wireEvents() {
     $("mineralImageCaption").textContent = "A imagem mineral não pôde ser carregada. A estrutura 3D permanece disponível.";
   });
 
+  $("mineralImageButton").addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleMineralImageZoom();
+  });
+
+  document.addEventListener("click", event => {
+    if ($("mineralFigure")?.classList.contains("image-expanded") && !$("mineralImageButton")?.contains(event.target)) {
+      closeMineralImageZoom();
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeMineralImageZoom();
+  });
+
   $("measureMode").addEventListener("click", async () => {
     if (!state.key) {
       toast("Abra uma estrutura do roteiro científico antes de medir.", "info");
@@ -390,7 +432,7 @@ function wireEvents() {
     ].filter(Boolean).join("\n");
     try {
       await navigator.clipboard.writeText(text);
-      toast("Proveniência 5.3.0 copiada.", "success");
+      toast("Proveniência 5.3.1 copiada.", "success");
     } catch {
       toast("Não foi possível copiar a proveniência.", "error");
     }

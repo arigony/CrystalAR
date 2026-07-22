@@ -9,21 +9,21 @@ const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const scienceModule = await readFile(new URL("../src/science-v510.js", import.meta.url), "utf8");
 const expectedCounts = { tio2Rutile: 6, tio2Anatase: 12, tio2Brookite: 24, caco3Calcite: 30, caco3Aragonite: 20 };
 
-test("package and scientific release are version 5.3.0", async () => {
+test("package and scientific release are version 5.3.1", async () => {
   const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
-  assert.equal(pkg.version, "5.3.0");
+  assert.equal(pkg.version, "5.3.1");
   const loader = await readFile(new URL("../src/runtime-watchdog.js", import.meta.url), "utf8");
-  assert.match(loader, /science-v510\.js\?v=5\.3\.0/);
-  assert.match(scienceModule, /const VERSION = "v5\.3\.0"/);
+  assert.match(loader, /science-v510\.js\?v=5\.3\.1/);
+  assert.match(scienceModule, /const VERSION = "v5\.3\.1"/);
 });
 
-test("HTML-base exposes 5.3.0 before JavaScript enhancement", () => {
-  assert.match(index, /Versão v5\.3\.0/);
+test("HTML-base exposes 5.3.1 before JavaScript enhancement", () => {
+  assert.match(index, /Versão v5\.3\.1/);
   assert.match(index, /roteiro diamante-grafite/i);
-  assert.match(index, /style-v510\.css\?v=5\.3\.0/);
-  assert.match(index, /runtime-watchdog\.js\?v=5\.3\.0/);
-  assert.match(index, /provenance\.js\?v=5\.3\.0/);
-  assert.match(index, /app\.js\?v=5\.3\.0/);
+  assert.match(index, /style-v510\.css\?v=5\.3\.1/);
+  assert.match(index, /runtime-watchdog\.js\?v=5\.3\.1/);
+  assert.match(index, /provenance\.js\?v=5\.3\.1/);
+  assert.match(index, /app\.js\?v=5\.3\.1/);
   assert.doesNotMatch(index, /\?v=5\.2\.0/);
 });
 
