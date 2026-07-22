@@ -1,4 +1,38 @@
 export const SCIENCE_EXAMPLES = {
+  carbonDiamond: {
+    family: "carbon", label: "C — diamante", shortLabel: "Diamante", path: "examples/diamond-9012293.cif", codId: "9012293",
+    originalSpaceGroup: "Fd-3m (nº 227)", crystalSystem: "cúbico", coordination: "cada C ligado covalentemente a 4 C",
+    hybridization: "sp³", dimensionality: "rede covalente tridimensional",
+    propertySummary: "Rede 3D rígida: elevada dureza e comportamento isolante elétrico no estado puro.",
+    teachingNote: "Observe a geometria tetraédrica local e procure caminhos covalentes que se estendem nas três dimensões.",
+    question: "Por que uma rede covalente 3D resiste melhor à deformação do que uma estrutura em camadas?",
+    mineralImage: {
+      path: "assets/minerals/diamond.jpg", kind: "Fotografia de cristal real", title: "Diamante bruto — C",
+      alt: "Cristal bruto e isolado de diamante, sem lapidação e sem outro mineral dominando a imagem.",
+      caption: "Cristal bruto de diamante de 0,7 ct. As faces externas resultam do crescimento cristalino; não são uma fotografia da rede atômica.",
+      author: "Tõnu Pani", license: "CC BY 4.0", source: "https://commons.wikimedia.org/wiki/File:Diamond_crystal,_0,7_ct.jpg"
+    },
+    representation: "ball-stick", supercell: 2, showBonds: true,
+    bondRules: [{ elements: ["C", "C"], minDistance: 1.35, maxDistance: 1.65, kind: "covalent" }],
+    polyhedra: null
+  },
+  carbonGraphite: {
+    family: "carbon", label: "C — grafite 2H", shortLabel: "Grafite", path: "examples/graphite-1200017.cif", codId: "1200017",
+    originalSpaceGroup: "P6₃/mmc (nº 194)", crystalSystem: "hexagonal", coordination: "cada C ligado covalentemente a 3 C na camada",
+    hybridization: "sp²", dimensionality: "folhas bidimensionais empilhadas",
+    propertySummary: "Ligações fortes na camada e interações mais fracas entre camadas: maciez, clivagem e condução elétrica anisotrópica.",
+    teachingNote: "Identifique os anéis hexagonais, as folhas planas e a separação entre camadas. As linhas não devem unir carbonos de folhas diferentes.",
+    question: "Qual característica estrutural permite que o grafite deixe traços no papel?",
+    mineralImage: {
+      path: "assets/minerals/graphite.jpg", kind: "Fotografia de exemplar real", title: "Grafite — C",
+      alt: "Massa natural cinza-aço de grafite, com aspecto lamelar e foliado claramente visível.",
+      caption: "Massa natural de grafite com forma lamelar e brilho cinza-aço. O aspecto foliado ajuda a introduzir o deslizamento entre camadas.",
+      author: "Rob Lavinsky, iRocks.com", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Graphite-233436.jpg"
+    },
+    representation: "ball-stick", supercell: 2, showBonds: true,
+    bondRules: [{ elements: ["C", "C"], minDistance: 1.30, maxDistance: 1.60, kind: "covalent" }],
+    polyhedra: null
+  },
   tio2Rutile: {
     family: "tio2", label: "TiO₂ — rutilo", shortLabel: "Rutilo", path: "examples/tio2-rutile-9015662.cif", codId: "9015662",
     originalSpaceGroup: "P4₂/mnm (nº 136)", crystalSystem: "tetragonal", coordination: "TiO₆ distorcido; octaedros compartilham arestas e vértices",
@@ -87,6 +121,23 @@ export const SCIENCE_EXAMPLES = {
 };
 
 export const LESSON_FAMILIES = {
+  carbon: {
+    title: "Carbono: mesma composição, redes diferentes", keys: ["carbonDiamond", "carbonGraphite"],
+    guidingQuestion: "Como o mesmo elemento químico pode originar um material extremamente duro e outro macio e condutor?",
+    synthesis: "Compare número de vizinhos, geometria local, hibridização e dimensionalidade. A propriedade não depende apenas da composição: depende de como os átomos estão conectados.",
+    comparison: [
+      ["Composição", "C", "C"],
+      ["Vizinhos por C", "4", "3"],
+      ["Geometria / hibridização", "tetraédrica · sp³", "trigonal planar · sp²"],
+      ["Dimensionalidade", "rede covalente 3D", "folhas 2D empilhadas"],
+      ["Propriedade-chave", "muito duro · isolante", "macio · condutor anisotrópico"]
+    ],
+    questions: [
+      "Qual estrutura apresenta caminhos covalentes contínuos nas três dimensões?",
+      "Por que as folhas do grafite podem deslizar sem romper todas as ligações C–C?",
+      "Como a coordenação 4 versus 3 se relaciona com sp³ e sp²?"
+    ]
+  },
   tio2: {
     title: "Polimorfos do TiO₂", keys: ["tio2Rutile", "tio2Anatase", "tio2Brookite"],
     guidingQuestion: "Como a conectividade e a distorção dos octaedros TiO₆ mudam sem alterar a composição TiO₂?",
