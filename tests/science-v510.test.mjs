@@ -7,21 +7,22 @@ import { SCIENCE_EXAMPLES, LESSON_FAMILIES } from "../src/science-presets.js";
 
 const expectedCounts = { tio2Rutile: 6, tio2Anatase: 12, tio2Brookite: 24, caco3Calcite: 30, caco3Aragonite: 20 };
 
-test("package and scientific release are version 5.2.0", async () => {
+test("package and scientific release are version 5.3.0", async () => {
   const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
-  assert.equal(pkg.version, "5.2.0");
+  assert.equal(pkg.version, "5.3.0");
   const loader = await readFile(new URL("../src/runtime-watchdog.js", import.meta.url), "utf8");
-  assert.match(loader, /science-v510\.js\?v=5\.2\.0/);
+  assert.match(loader, /science-v510\.js\?v=5\.3\.0/);
 });
 
-test("two lesson families contain three polymorphs each", () => {
+test("three lesson families include carbon, TiO2 and CaCO3", () => {
+  assert.deepEqual(LESSON_FAMILIES.carbon.keys, ["carbonDiamond", "carbonGraphite"]);
   assert.deepEqual(LESSON_FAMILIES.tio2.keys, ["tio2Rutile", "tio2Anatase", "tio2Brookite"]);
   assert.deepEqual(LESSON_FAMILIES.caco3.keys, ["caco3Calcite", "caco3Aragonite", "caco3Vaterite"]);
-  assert.equal(Object.keys(SCIENCE_EXAMPLES).length, 6);
+  assert.equal(Object.keys(SCIENCE_EXAMPLES).length, 8);
 });
 
 for (const [key, example] of Object.entries(SCIENCE_EXAMPLES)) {
-  test(`${key} has a valid local P1 derivative and provenance`, async () => {
+  test(`${key} has a valid local derivative and provenance`, async () => {
     const text = await readFile(new URL(`../${example.path}`, import.meta.url), "utf8");
     assert.match(text, new RegExp(`_cod_database_code\\s+${example.codId}`));
     assert.match(text, /_cod_original_sg_symbol_H-M/);
@@ -41,6 +42,31 @@ for (const [key, example] of Object.entries(SCIENCE_EXAMPLES)) {
     assert.ok(example.mineralImage.caption.length > 30);
   });
 }
+
+test("carbon route distinguishes sp3 diamond and sp2 graphite", () => {
+  const diamond = SCIENCE_EXAMPLES.carbonDiamond;
+  const graphite = SCIENCE_EXAMPLES.carbonGraphite;
+  assert.equal(diamond.hybridization, "sp³");
+  assert.equal(graphite.hybridization, "sp²");
+  assert.match(diamond.dimensionality, /tridimensional/i);
+  assert.match(graphite.dimensionality, /bidimensionais/i);
+  assert.equal(LESSON_FAMILIES.carbon.comparison.length, 5);
+  assert.equal(LESSON_FAMILIES.carbon.questions.length, 3);
+});
+
+test("carbon bond rules include only short C-C covalent contacts", async () => {
+  for (const key of ["carbonDiamond", "carbonGraphite"]) {
+    const example = SCIENCE_EXAMPLES[key];
+    const text = await readFile(new URL(`../${example.path}`, import.meta.url), "utf8");
+    const model = buildCrystalModel(parseCIFDocument(text), 2);
+    const bonds = inferBonds(model.atoms, 18000, example.bondRules);
+    assert.ok(bonds.length > 0);
+    for (const [a, b] of bonds) {
+      assert.equal(model.atoms[a].element, "C");
+      assert.equal(model.atoms[b].element, "C");
+    }
+  }
+});
 
 test("rutile image avoids a quartz-dominated teaching example", () => {
   const image = SCIENCE_EXAMPLES.tio2Rutile.mineralImage;
